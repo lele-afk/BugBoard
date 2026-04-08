@@ -1,13 +1,13 @@
 import { database } from "./server";
 import { commento, issue, utente } from "./db/schemas";
 import { and, arrayOverlaps, asc, count, desc, eq, gte, isNull, lte, sql } from "drizzle-orm";
-import { InsertCommenti, InsertIssue, InsertUtenti, RegistrationUser, SelectUtenti, UserLogged, ResponseEmail, Filter } from "./db/type";
+import { InsertCommenti, InsertIssue, InsertUtenti, RegistrationUser, SelectUtenti, UserLogged, ResponseEmail, Filter, Role } from "./db/type";
 import * as bcrypt from "bcryptjs"
 import * as jwt from 'jsonwebtoken'
 import * as nodemailer from 'nodemailer'
 import { codeGenerator } from "./middleware/codeGenerator";
 
-async function userLogin(filters: { email: string; password: string; }) {
+async function userLogin(filters: { email: string; }) {
     try {
         const user = await database.query.utente.findFirst({
             where: eq(utente.email, filters.email)
@@ -35,7 +35,7 @@ export async function userRegistration(newUser: InsertUtenti): Promise<Registrat
 
     try {
         const userRegister: SelectUtenti[] = await database.insert(utente).values(registrationUserData).returning();
-        const userRegistrated = { idUser: userRegister[0].id_utente, email: userRegister[0].email, hashedPassword: userRegister[0].password }
+        const userRegistrated = { idUser: userRegister[0].id_utente, email: userRegister[0].email, hashedPassword: userRegister[0].password, nome: userRegister[0].nome, cognome: userRegister[0].cognome, role: userRegister[0].role }
         return userRegistrated;
     } catch (error) {
         throw { code: 500, message: "Errore recupero dati." }
@@ -87,7 +87,7 @@ export async function sendMail(newUser: InsertUtenti): Promise<ResponseEmail> {
 }
 
 export async function loginUtente(user: InsertUtenti): Promise<UserLogged> {
-    const filters = { email: user.email, password: user.password };
+    const filters = { email: user.email };
 
     const check = await checkUser({ email: user.email })
     if (!check) {
@@ -105,8 +105,16 @@ export async function loginUtente(user: InsertUtenti): Promise<UserLogged> {
     }
 
     if (userFinded) {
-        const token = jwt.sign({ id: userFinded.id_utente }, process.env.JWT_SECRET);
-        return { idUser: userFinded.id_utente, nome: userFinded.nome, cognome: userFinded.cognome, email: userFinded.email, hashedPassword: userFinded.password, jwtToken: token }
+        const token = jwt.sign({ id: userFinded.id_utente, role: userFinded.role }, process.env.JWT_SECRET);
+        return {
+            idUser: userFinded.id_utente,
+            nome: userFinded.nome,
+            cognome: userFinded.cognome,
+            email: userFinded.email,
+            hashedPassword: userFinded.password,
+            jwtToken: token,
+            role: userFinded.role
+        }
     }
 
     throw { code: 400, message: "Login fallito." }

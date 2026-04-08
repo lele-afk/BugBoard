@@ -5,7 +5,8 @@ import { JwtPayload } from "jsonwebtoken";
 export type SelectUtenti = InferSelectModel<typeof utente>;
 export type InsertUtenti = typeof utente.$inferInsert;
 export type RegistrationUser = { idUser: number, email: string, hashedPassword: string }
-export type UserLogged = { idUser: number, nome: string, cognome: string, hashedPassword: string, jwtToken: string | JwtPayload, email: string }
+export type Role = (typeof utente.$inferSelect)['role'];
+export type UserLogged = { idUser: number, nome: string, cognome: string, hashedPassword: string, jwtToken: string | JwtPayload, email: string, role: Role }
 
 export type InsertCommenti = InferInsertModel<typeof commento>;
 

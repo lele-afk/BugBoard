@@ -1,19 +1,24 @@
 import { relations, sql } from "drizzle-orm";
-import { pgTable } from "drizzle-orm/pg-core"
+import { pgTable, pgEnum, pgRole } from "drizzle-orm/pg-core"
 import * as type from "drizzle-orm/pg-core";
+
+export const ruoloEnum = pgEnum('ruolo_enum', ["user", "admin"]);
 
 export const utente = pgTable('utente', {
     id_utente: type.integer().notNull().primaryKey().generatedAlwaysAsIdentity(),
     nome: type.varchar({ length: 50 }).notNull(),
     cognome: type.varchar({ length: 50 }).notNull(),
     email: type.varchar({ length: 100 }).notNull().unique(),
-    password: type.varchar("password_hash", { length: 255 }).notNull(),
+    password: type.varchar({ length: 255 }).notNull(),
+    role: ruoloEnum('role').notNull().default("user"),
     data_registrazione: type.timestamp().defaultNow()
 });
 
 export const relazioneUtenteIssue = relations(utente, ({ many, one }) => ({
     issues: many(issue),
 }));
+
+export const admin = pgRole('admin').existing();
 
 export const issue = pgTable('issue', {
     id_issue: type.integer().notNull().primaryKey().generatedAlwaysAsIdentity(),
