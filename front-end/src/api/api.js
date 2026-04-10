@@ -1,4 +1,4 @@
-import { _get, _post, _put } from "./api.config";
+import { _get, _post } from "./api.config";
 
 export const loginUser = async (loginData) => {
     try {
@@ -13,7 +13,7 @@ export const loginUser = async (loginData) => {
     }
 }
 
-export const insertIsssue = async (newIssue) => {
+export const insertIssue = async (newIssue) => {
     try {
         const response = await _post('/issue/insert', newIssue)
         return response
