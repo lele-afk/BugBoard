@@ -3,9 +3,16 @@ import React from "react";
 
 const StyledButton = ({ label, onClick, sx, main = true, endIcon, ...props }) => {
     const color = main ? "#6750A4" : "#D61616"
+    const handleClick = () => {
+        if (onClick) {
+            onClick()
+        }
+
+    }
+
     return <Button
         variant="contained"
-        onClick={onClick}
+        onClick={handleClick}
         sx={{
             backgroundColor: color,
             '&:hover': {
