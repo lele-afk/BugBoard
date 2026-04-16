@@ -10,7 +10,15 @@ import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import StyledButton from './StyledButton';
 
-const CardForm = ({ withPrivateData = false }) => {
+const CardForm = ({ withPrivateData = false,
+    withBackButton = false,
+    textOfTitle = 'Titolo',
+    textOfSubtitle = 'Sottotitolo',
+    textOfDescription = 'Descrizione',
+    textOfButtonOfSubmit = 'Bottone',
+    onBack,
+    onSubmit }) => {
+
     const [showPassword, setShowPassword] = useState(false);
     const [showRePassword, setShowRePassword] = useState(false);
 
@@ -26,7 +34,11 @@ const CardForm = ({ withPrivateData = false }) => {
         event.preventDefault();
     };
 
-    const handleSubmit = () => { }
+    const handleSubmit = () => {
+        if (onSubmit) {
+            onSubmit();
+        }
+    }
 
     return <Box
         component="form"
@@ -37,7 +49,7 @@ const CardForm = ({ withPrivateData = false }) => {
             alignItems: 'center',
             minHeight: '100vh',
             width: '100%',
-            py: 4,
+
 
         }}
     >
@@ -53,7 +65,7 @@ const CardForm = ({ withPrivateData = false }) => {
                     textAlign: 'center'
                 }}
                 gutterBottom>
-                Pagina di Login
+                {textOfTitle}
             </Typography>
             <Typography variant="h3"
                 sx={{
@@ -61,10 +73,10 @@ const CardForm = ({ withPrivateData = false }) => {
                     textAlign: 'center'
                 }}
                 gutterBottom>
-                Accedi al tuo account
+                {textOfSubtitle}
             </Typography>
             <Typography variant="subtitle1" gutterBottom>
-                Inserisci i tuoi dati per effettuare l’accesso
+                {textOfDescription}
             </Typography>
             <Card sx={{
                 width: '100%',
@@ -167,10 +179,15 @@ const CardForm = ({ withPrivateData = false }) => {
                 </CardContent>
 
             </Card>
-            <StyledButton fullWidth label={'Accedi'} sx={{
-                py: 1.5, // Bottone un po' più alto per il touch su mobile
-                fontSize: '1.1rem'
+            <StyledButton fullWidth label={textOfButtonOfSubmit} sx={{
+                py: 1.5,
+                fontSize: '1.1rem',
+                backgroundColor: 'black'
             }} />
+            {withBackButton && <StyledButton fullWidth label={'Indietro'} sx={{
+                py: 1.5,
+                fontSize: '1.1rem'
+            }} main={false} onClick={onBack} />}
         </Stack>
     </Box >
 

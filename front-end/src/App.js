@@ -3,6 +3,7 @@ import { useDispatch } from 'react-redux';
 import { setDispatch } from './api/api.config';
 import { Box } from '@mui/material';
 import Router from './router/router';
+import Header from './component/Header';
 
 
 function App() {
@@ -17,10 +18,13 @@ function App() {
 
   return (
     <Box sx={{
+      display: 'flex',
+      flexDirection: 'column',
       height: '100vh',
       width: '100vw',
-      overflow: { md: 'hidden' },
+      overflow: 'hidden',
     }}>
+      <Header></Header>
       <Router />
     </Box>
   );

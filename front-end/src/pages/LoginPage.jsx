@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { } from "react";
 import { Box, Divider, Grid, Stack, Typography } from '@mui/material';
 import StyledButton from '../component/StyledButton'
 import CardForm from '../component/CardForm';
@@ -8,12 +8,9 @@ const LoginPage = () => {
     const { logged } = useSelector(state => state.userState)
     const navigate = useNavigate()
 
-    useEffect(() => {
-        if (logged) {
-            navigate('/dashboard')
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [logged])
+    const handleLogin = () => { console.log('logged :>> ', logged); }
+
+
 
     const navigateToRegistration = () => {
         navigate('/registration')
@@ -24,11 +21,19 @@ const LoginPage = () => {
         <Grid size={{ xs: 16, md: 9, lg: 10 }}>
             <Stack
                 direction={'column'}
-                sx={{ minHeight: { xs: 'auto', md: '100vh' }, py: { xs: 8, md: 0 } }}
+                sx={{
+                    minHeight: { xs: 'auto', md: 'calc(100vh - 64px)' },
+                    py: { xs: 8, md: 0 }
+                }}
                 justifyContent={'center'}
                 alignItems={'center'}
             >
-                <CardForm />
+                <CardForm
+                    textOfTitle={'Pagina di Login '}
+                    textOfSubtitle={'Accedi al tuo account'}
+                    textOfDescription={'Inserisci i tuoi dati per effettuare l’accesso'}
+                    textOfButtonOfSubmit="Accedi"
+                    onSubmit={handleLogin} />
             </Stack>
         </Grid>
 
