@@ -5,11 +5,13 @@ import { useNavigate } from 'react-router-dom'
 const Registration = () => {
     const navigate = useNavigate();
     const handleRegistrationSubmit = () => {
-
+        console.log("ciao");
+        // se non ci sono errori di password
+        navigate('/verificationCode')
     }
 
     const handleBack = () => {
-        navigate('/login')
+        navigate("/")
     }
 
     return (

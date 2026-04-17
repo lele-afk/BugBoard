@@ -10,8 +10,6 @@ const LoginPage = () => {
 
     const handleLogin = () => { console.log('logged :>> ', logged); }
 
-
-
     const navigateToRegistration = () => {
         navigate('/registration')
     }

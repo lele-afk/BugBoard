@@ -16,6 +16,8 @@ const CardForm = ({ withPrivateData = false,
     textOfSubtitle = 'Sottotitolo',
     textOfDescription = 'Descrizione',
     textOfButtonOfSubmit = 'Bottone',
+    onlyVerificationCode = false,
+
     onBack,
     onSubmit }) => {
 
@@ -34,7 +36,19 @@ const CardForm = ({ withPrivateData = false,
         event.preventDefault();
     };
 
-    const handleSubmit = () => {
+    const validateInputs = () => {
+        /* const password = document.getElementById('password');
+       const email = document.getElementById('email'); */
+
+    }
+
+    const handleSubmit = (event) => {
+        event.preventDefault();
+
+        if (!validateInputs()) {
+            return;
+        }
+
         if (onSubmit) {
             onSubmit();
         }
@@ -89,97 +103,110 @@ const CardForm = ({ withPrivateData = false,
                     '&:last-child': { pb: { xs: 3, sm: 5 } }
                 }} >
                     <Stack direction={'column'} spacing={2.5} >
-                        {withPrivateData && <>
+                        {onlyVerificationCode ? <FormControl >
+                            <FormLabel htmlFor="verificationCode" sx={{ fontWeight: 'bold' }}>Inserisci codice di verifica</FormLabel>
+                            <TextField
+                                name="verificationCode"
+                                required
+                                fullWidth
+                                id="verificationCode"
+                                sx={{ backgroundColor: 'white', mb: 3 }}
+                            />
+                        </FormControl> : <>
+                            {withPrivateData && <>
+                                <FormControl >
+                                    <FormLabel htmlFor="nome" sx={{ fontWeight: 'bold' }}>Inserisci nome</FormLabel>
+                                    <TextField
+                                        name="nome"
+                                        required
+                                        fullWidth
+                                        id="nome"
+                                        sx={{ backgroundColor: 'white', mb: 3 }}
+                                    />
+                                </FormControl>
+                                <FormControl >
+                                    <FormLabel htmlFor="cognome" sx={{ fontWeight: 'bold' }}>Inserisci cognome</FormLabel>
+                                    <TextField
+                                        name="cognome"
+                                        required
+                                        fullWidth
+                                        id="cognome"
+                                        sx={{ backgroundColor: 'white', mb: 3 }}
+                                    />
+                                </FormControl>
+                            </>}
                             <FormControl >
-                                <FormLabel htmlFor="nome" sx={{ fontWeight: 'bold' }}>Inserisci nome</FormLabel>
+                                <FormLabel htmlFor="email" sx={{ fontWeight: 'bold' }}>Inserisci email</FormLabel>
                                 <TextField
-                                    name="nome"
+                                    name="email"
                                     required
                                     fullWidth
-                                    id="nome"
+                                    id="email"
                                     sx={{ backgroundColor: 'white', mb: 3 }}
                                 />
                             </FormControl>
                             <FormControl >
-                                <FormLabel htmlFor="cognome" sx={{ fontWeight: 'bold' }}>Inserisci cognome</FormLabel>
+                                <FormLabel htmlFor="password" sx={{ fontWeight: 'bold' }}>Inserisci password</FormLabel>
                                 <TextField
-                                    name="cognome"
+                                    name="password"
                                     required
                                     fullWidth
-                                    id="cognome"
+                                    id="password"
                                     sx={{ backgroundColor: 'white', mb: 3 }}
+                                    type={showPassword ? 'text' : 'password'}
+                                    slotProps={{
+                                        input: {
+                                            endAdornment:
+                                                <InputAdornment position="end">
+                                                    <IconButton
+
+                                                        onClick={handleClickShowPassword}
+                                                        onMouseDown={handleMouseDownPassword}
+                                                        onMouseUp={handleMouseUpPassword}
+                                                        edge="end"
+                                                    >
+                                                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                                                    </IconButton>
+                                                </InputAdornment>
+                                        }
+                                    }}
                                 />
-                            </FormControl></>}
-                        <FormControl >
-                            <FormLabel htmlFor="email" sx={{ fontWeight: 'bold' }}>Inserisci email</FormLabel>
-                            <TextField
-                                name="email"
-                                required
-                                fullWidth
-                                id="email"
-                                sx={{ backgroundColor: 'white', mb: 3 }}
-                            />
-                        </FormControl>
-                        <FormControl >
-                            <FormLabel htmlFor="password" sx={{ fontWeight: 'bold' }}>Inserisci password</FormLabel>
-                            <TextField
-                                name="password"
-                                required
-                                fullWidth
-                                id="password"
-                                sx={{ backgroundColor: 'white', mb: 3 }}
-                                type={showPassword ? 'text' : 'password'}
-                                slotProps={{
-                                    input: {
-                                        endAdornment:
-                                            <InputAdornment position="end">
-                                                <IconButton
+                            </FormControl>
+                            <FormControl >
+                                <FormLabel htmlFor="re-password" sx={{ fontWeight: 'bold' }}>Ripeti la password</FormLabel>
+                                <TextField
+                                    name="re-password"
+                                    required
+                                    fullWidth
+                                    id="re-password"
+                                    sx={{ backgroundColor: 'white', mb: 3 }}
+                                    type={showRePassword ? 'text' : 'password'}
+                                    slotProps={{
+                                        input: {
+                                            endAdornment:
+                                                <InputAdornment position="end">
+                                                    <IconButton
 
-                                                    onClick={handleClickShowPassword}
-                                                    onMouseDown={handleMouseDownPassword}
-                                                    onMouseUp={handleMouseUpPassword}
-                                                    edge="end"
-                                                >
-                                                    {showPassword ? <VisibilityOff /> : <Visibility />}
-                                                </IconButton>
-                                            </InputAdornment>
-                                    }
-                                }}
-                            />
-                        </FormControl>
-                        <FormControl >
-                            <FormLabel htmlFor="re-password" sx={{ fontWeight: 'bold' }}>Ripeti la password</FormLabel>
-                            <TextField
-                                name="re-password"
-                                required
-                                fullWidth
-                                id="re-password"
-                                sx={{ backgroundColor: 'white', mb: 3 }}
-                                type={showRePassword ? 'text' : 'password'}
-                                slotProps={{
-                                    input: {
-                                        endAdornment:
-                                            <InputAdornment position="end">
-                                                <IconButton
-
-                                                    onClick={handleClickShowRePassword}
-                                                    onMouseDown={handleMouseDownPassword}
-                                                    onMouseUp={handleMouseUpPassword}
-                                                    edge="end"
-                                                >
-                                                    {showRePassword ? <VisibilityOff /> : <Visibility />}
-                                                </IconButton>
-                                            </InputAdornment>
-                                    }
-                                }}
-                            />
-                        </FormControl>
+                                                        onClick={handleClickShowRePassword}
+                                                        onMouseDown={handleMouseDownPassword}
+                                                        onMouseUp={handleMouseUpPassword}
+                                                        edge="end"
+                                                    >
+                                                        {showRePassword ? <VisibilityOff /> : <Visibility />}
+                                                    </IconButton>
+                                                </InputAdornment>
+                                        }
+                                    }}
+                                />
+                            </FormControl>
+                        </>
+                        }
 
                     </Stack>
                 </CardContent>
 
             </Card>
-            <StyledButton fullWidth label={textOfButtonOfSubmit} sx={{
+            <StyledButton type='submit' fullWidth label={textOfButtonOfSubmit} sx={{
                 py: 1.5,
                 fontSize: '1.1rem',
                 backgroundColor: 'black'
