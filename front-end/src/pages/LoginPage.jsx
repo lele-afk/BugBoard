@@ -3,12 +3,15 @@ import { Box, Divider, Grid, Stack, Typography } from '@mui/material';
 import StyledButton from '../component/StyledButton'
 import CardForm from '../component/CardForm';
 import { useNavigate } from 'react-router-dom';
-import { useSelector } from 'react-redux'
+// import { useSelector } from 'react-redux'
 const LoginPage = () => {
-    const { logged } = useSelector(state => state.userState)
+    // const { logged } = useSelector(state => state.userState)
     const navigate = useNavigate()
 
-    const handleLogin = () => { console.log('logged :>> ', logged); }
+    const handleLogin = () => {
+
+        navigate('/dashboard')
+    }
 
     const navigateToRegistration = () => {
         navigate('/registration')

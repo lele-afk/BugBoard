@@ -39,10 +39,11 @@ const CardForm = ({ withPrivateData = false,
     const validateInputs = () => {
         /* const password = document.getElementById('password');
        const email = document.getElementById('email'); */
-
+        return true
     }
 
     const handleSubmit = (event) => {
+        console.log('ciao :>> ');
         event.preventDefault();
 
         if (!validateInputs()) {
@@ -201,11 +202,10 @@ const CardForm = ({ withPrivateData = false,
                             </FormControl>
                         </>
                         }
-
                     </Stack>
                 </CardContent>
-
             </Card>
+
             <StyledButton type='submit' fullWidth label={textOfButtonOfSubmit} sx={{
                 py: 1.5,
                 fontSize: '1.1rem',
