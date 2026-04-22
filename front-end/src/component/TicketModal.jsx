@@ -1,5 +1,6 @@
 import React from 'react';
-import { Modal, Box, Typography, Button, Divider } from '@mui/material';
+import { Modal, Box, Typography, Divider } from '@mui/material';
+import StyledButton from './StyledButton';
 
 const style = {
     position: 'absolute',
@@ -34,9 +35,9 @@ const TicketModal = ({ open, handleClose, ticket }) => {
                 </Typography>
 
                 <Box sx={{ mt: 4, display: 'flex', justifyContent: 'flex-end' }}>
-                    <Button onClick={handleClose} variant="contained" color="primary">
+                    <StyledButton onClick={handleClose} label='Chiudi'>
                         Chiudi
-                    </Button>
+                    </StyledButton>
                 </Box>
             </Box>
         </Modal>

@@ -12,8 +12,10 @@ import {
 } from '@mui/material';
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 import PriorityHighIcon from '@mui/icons-material/PriorityHigh';
+import AddIcon from '@mui/icons-material/Add';
 import TicketModal from '../component/TicketModal';
 import StyledButton from '../component/StyledButton';
+import FormModal from '../component/FormModal';
 
 const INITIAL_TICKETS = [
     { id: '1', title: 'Creare API Login', status: 'TO-DO', description: 'Implementare endpoint JWT' },
@@ -28,6 +30,7 @@ const COLUMNS = ['TO-DO', 'DOING', 'DONE'];
 const Dashboard = () => {
     const [selectedTicket, setSelectedTicket] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isModalOpenOfCreationTicket, setIsModalOpenOfCreationTicket] = useState(false);
 
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
@@ -36,6 +39,13 @@ const Dashboard = () => {
         setSelectedTicket(ticket);
         setIsModalOpen(true);
     };
+
+    const handleOpenCreateTicket = () => {
+        setIsModalOpenOfCreationTicket(true)
+    }
+    const handleCloseCreateTicket = () => {
+        setIsModalOpenOfCreationTicket(false)
+    }
 
     const handleCloseModal = () => {
         setIsModalOpen(false);
@@ -47,15 +57,13 @@ const Dashboard = () => {
     return (
         <Box
             sx={{
-                // Importante: occupiamo tutto lo spazio che il router ci dà
                 flexGrow: 1,
                 width: '100%',
                 display: 'flex',
                 justifyContent: 'center',
                 boxSizing: 'border-box',
                 p: { xs: 1, sm: 2, md: 3 },
-                // Su desktop l'overflow è gestito dalle singole colonne
-                // Su mobile permettiamo al main di scrollare se le colonne si impilano
+
                 overflowY: isMobile ? 'auto' : 'hidden',
                 bgcolor: '#ffffff'
             }}
@@ -63,17 +71,18 @@ const Dashboard = () => {
             <Box sx={{
                 width: '100%',
                 maxWidth: '1800px',
-                height: '90%', // Prende il 100% dello spazio sotto l'header
+                height: '90%',
                 display: 'flex',
                 flexDirection: 'column'
             }}>
 
-                {/* --- TOOLBAR FILTRI --- */}
+
                 <Box sx={{ mb: 2 }}>
                     <Stack
                         direction={{ xs: 'column', sm: 'row' }}
                         spacing={2}
                         alignItems={{ xs: 'flex-start', sm: 'center' }}
+                        justifyContent={{ xs: 'flex-start', sm: 'space-between' }}
                     >
 
                         <Stack direction="row" spacing={1}>
@@ -89,6 +98,12 @@ const Dashboard = () => {
                                 endIcon={<PriorityHighIcon />}
                             ></StyledButton>
                         </Stack>
+                        <StyledButton
+                            label={"Crea ticket"}
+                            main={true}
+                            endIcon={<AddIcon />}
+                            onClick={handleOpenCreateTicket}
+                        ></StyledButton>
                     </Stack>
                 </Box>
 
@@ -101,8 +116,8 @@ const Dashboard = () => {
                         borderRadius: { xs: 2, md: 4 },
                         p: { xs: 1, md: 2 },
                         gap: { xs: 2, md: 2 },
-                        overflow: 'hidden', // Blocca lo scroll qui per farlo gestire alle colonne
-                        minHeight: 0 // Cruciale per far funzionare flex-grow + overflow in CSS
+                        overflow: 'hidden',
+                        minHeight: 0
                     }}
                 >
                     {COLUMNS.map((status) => (
@@ -115,7 +130,6 @@ const Dashboard = () => {
                                 display: 'flex',
                                 flexDirection: 'column',
                                 p: 1.5,
-                                // Altezza minima per non far sparire la colonna su mobile
                                 minHeight: isMobile ? '250px' : 0,
                             }}
                         >
@@ -167,6 +181,7 @@ const Dashboard = () => {
             </Box>
 
             <TicketModal open={isModalOpen} handleClose={handleCloseModal} ticket={selectedTicket} />
+            <FormModal open={isModalOpenOfCreationTicket} handleClose={handleCloseCreateTicket}></FormModal>
         </Box>
     );
 };

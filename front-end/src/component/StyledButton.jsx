@@ -1,7 +1,7 @@
 import { Button } from "@mui/material";
 import React from "react";
 
-const StyledButton = ({ label, onClick, sx, main = true, endIcon, ...props }) => {
+const StyledButton = ({ label, onClick, sx, main = true, endIcon, children, ...props }) => {
     const color = main ? "#6750A4" : "#D61616"
     const handleClick = () => {
         if (onClick) {
@@ -25,6 +25,7 @@ const StyledButton = ({ label, onClick, sx, main = true, endIcon, ...props }) =>
         {...props}
     >
         {label}
+        {children}
     </Button>
 
 }
