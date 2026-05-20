@@ -3,6 +3,11 @@ import { pgTable, pgEnum, pgRole } from "drizzle-orm/pg-core"
 import * as type from "drizzle-orm/pg-core";
 
 export const ruoloEnum = pgEnum('ruolo_enum', ["user", "admin"]);
+export const tipoEnum = pgEnum('tipo_enum', ["question", "bug", "documentation", "feature"]);
+export const statoEnum = pgEnum('stato_enum', ["todo", "in_progress", "done"]);
+export const prioritaEnum = pgEnum('priorita_enum', ["low", "medium", "high"]);
+
+
 
 export const utente = pgTable('utente', {
     // Se usi SERIAL nel DB, in Drizzle basta .primaryKey() senza generatedAlwaysAsIdentity
@@ -32,17 +37,21 @@ export const issue = pgTable('issue', {
     id_issue: type.integer().notNull().primaryKey().generatedAlwaysAsIdentity(),
     id_utente: type.integer().references(() => utente.id_utente).notNull(),
     titolo: type.varchar({ length: 100 }).notNull(),
-    priority: type.varchar({ length: 100 }).notNull(),
-    tipo: type.varchar({ length: 100 }).notNull(),
-    immagine_url: type.text().notNull(),
-    data_caricamento: type.timestamp().defaultNow(),
+    descrizione: type.varchar({ length: 255 }),
+    priorita: prioritaEnum('priorita').notNull().default("low"),
+    stato: statoEnum('stato').notNull().default("todo"),
+    tipo: tipoEnum('tipo').notNull().default("question"),
+    immagine: type.text(),
+    created_at: type.timestamp().defaultNow(),
+    updated_at: type.timestamp().defaultNow(),
 });
 
-export const relazioneIssueUtente = relations(issue, ({ one }) => ({
+export const relazioneIssueUtente = relations(issue, ({ one, many }) => ({
     utente: one(utente, {
         fields: [issue.id_utente],
         references: [utente.id_utente],
     }),
+    commenti: many(commento),
 }));
 
 
@@ -50,8 +59,8 @@ export const commento = pgTable('commento', {
     id_commento: type.integer().notNull().primaryKey().generatedAlwaysAsIdentity(),
     id_issue: type.integer().notNull().references(() => issue.id_issue),
     id_utente: type.integer().notNull().references(() => utente.id_utente),
-    testo: type.varchar({ length: 255 }).notNull(),
-    data_commento: type.timestamp().defaultNow()
+    commento: type.varchar({ length: 255 }).notNull(),
+    created_at: type.timestamp().defaultNow()
 });
 
 export const relazioneCommentoUtenteIssue = relations(commento, ({ one }) => ({
@@ -65,6 +74,3 @@ export const relazioneCommentoUtenteIssue = relations(commento, ({ one }) => ({
     }),
 }));
 
-export const relazioneIssueCommentiEVoti = relations(issue, ({ many }) => ({
-    commento: many(commento),
-}));

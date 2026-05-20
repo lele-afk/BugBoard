@@ -7,17 +7,6 @@ import * as jwt from 'jsonwebtoken'
 import * as nodemailer from 'nodemailer'
 import { codeGenerator } from "./middleware/codeGenerator";
 
-async function userLogin(filters: { email: string; }) {
-    try {
-        const user = await database.query.utente.findFirst({
-            where: eq(utente.email, filters.email)
-        })
-        return user
-    } catch (error) {
-        throw { code: 500, message: error }
-    }
-}
-
 async function checkUser(filters: { email: string; }) {
     try {
         const user = await database.query.utente.findFirst({
@@ -87,50 +76,87 @@ export async function sendMail(newUser: InsertUtenti): Promise<ResponseEmail> {
 }
 
 export async function loginUtente(user: InsertUtenti): Promise<UserLogged> {
-    const filters = { email: user.email };
+    const userFinded = await checkUser({ email: user.email });
 
-    const check = await checkUser({ email: user.email })
-    if (!check) {
-        throw { code: 400, message: "Utente non esistente." }
+    if (!userFinded) {
+        throw { code: 400, message: "Email o password non corretta." };
     }
 
-    const passwordValid = await bcrypt.compare(user.password, check.password);
+    const passwordValid = await bcrypt.compare(user.password, userFinded.password);
     if (!passwordValid) {
-        throw { code: 400, message: "Email o password non corretta." }
+        throw { code: 400, message: "Email o password non corretta." };
     }
 
-    const userFinded = await userLogin(filters);
     if (!process.env.JWT_SECRET) {
         throw new Error("JWT_SECRET non definito nelle variabili di ambiente");
     }
 
-    if (userFinded) {
-        const token = jwt.sign({ id: userFinded.id_utente, role: userFinded.role }, process.env.JWT_SECRET);
-        return {
-            idUser: userFinded.id_utente,
-            nome: userFinded.nome,
-            cognome: userFinded.cognome,
-            email: userFinded.email,
-            hashedPassword: userFinded.password,
-            jwtToken: token,
-            role: userFinded.role
-        }
-    }
+    const token = jwt.sign(
+        { id: userFinded.id_utente, role: userFinded.role },
+        process.env.JWT_SECRET
+    );
 
-    throw { code: 400, message: "Login fallito." }
+    return {
+        idUser: userFinded.id_utente,
+        nome: userFinded.nome,
+        cognome: userFinded.cognome,
+        email: userFinded.email,
+        hashedPassword: userFinded.password,
+        jwtToken: token,
+        role: userFinded.role
+    };
 }
+
 export async function getIssueWithSameId(filter: Filter) {
     try {
         const issues = await database.query.issue.findFirst({
             with: {
                 utente: true,
-                commento: true,
+                commenti: true,
             },
             where: filter.id ? eq(issue.id_issue, filter.id) : undefined
         })
         return issues;
     } catch (error) {
         throw { code: 500, message: "Errore recupero dati." }
+    }
+}
+
+export async function getIssue() {
+    try {
+        const issues = await database.query.issue.findMany({
+            with: {
+                utente: true,
+                commenti: true,
+            },
+        })
+        return issues;
+    } catch (error) {
+        console.log('error :>> ', error);
+        throw { code: 500, message: "Errore recupero dati." }
+    }
+}
+
+export async function insertIssue(newIssue: any): Promise<InsertIssue | undefined> {
+    try {
+        // Mappatura di sicurezza: allineiamo i dati del req.body con lo schema del DB
+        const dataToInsert = {
+            id_utente: newIssue.id_utente, // <-- Assicurati di passarlo dal FE (es. prendendolo dal JWT)
+            titolo: newIssue.titolo,
+            descrizione: newIssue.descrizione,
+            priorita: newIssue.priority,   // Se sul DB si chiama 'priorita' e dal FE arriva 'priority'
+            tipo: newIssue.tipo?.toLowerCase(), // Il DB si aspetta 'bug', dal FE arriva 'Bug' (maiuscolo)
+            immagine: newIssue.immagine_url, // Se sul DB si chiama 'immagine'
+        };
+
+        // AGGIUNTO .returning(): Forza Postgres a restituire i dati inseriti
+        const response = await database.insert(issue).values(dataToInsert).returning();
+
+        // Visto che response è un array (es: [insertedIssue]), restituiamo il primo elemento
+        return response[0];
+    } catch (error) {
+        console.error("Errore DB Insert:", error);
+        throw { code: 400, message: error };
     }
 }
 

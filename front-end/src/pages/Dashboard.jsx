@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     Box,
     Typography,
@@ -22,32 +22,40 @@ import StyledButton from '../component/StyledButton';
 import FormModal from '../component/FormModal';
 import { useNavigate } from 'react-router-dom';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { resetState } from '../state/user/userSlice';
 import CreationUserModal from '../component/CreationUserModal';
-const INITIAL_TICKETS = [
-    { id: '1', title: 'Creare API Login', status: 'TO-DO', description: 'Implementare endpoint JWT' },
-    { id: '2', title: 'Fix bug CSS Dashboard', status: 'DOING', description: 'Sistemare il padding delle colonne' },
-    { id: '3', title: 'Setup Progetto', status: 'DONE', description: 'Inizializzato repository e MUI' },
-    { id: '4', title: 'Test Sicurezza', status: 'TO-DO', description: 'Verifica vulnerabilità' },
-    { id: '5', title: 'Refactoring Modali', status: 'DOING', description: 'Migliorare performance' },
-];
+import { getIssues } from '../state/issue/issueAction';
+import DomicileBanner from '../component/DomicileBanner';
 
-const COLUMNS = ['TO-DO', 'DOING', 'DONE'];
+
+const COLUMNS = ['todo', 'in_progress', 'done'];
 
 const Dashboard = () => {
     const [selectedTicket, setSelectedTicket] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isModalOpenOfCreationTicket, setIsModalOpenOfCreationTicket] = useState(false);
     const [isModalCreationOpen, setIsModalCreationOpen] = useState(false);
-
+    const [err, setErr] = useState(false)
     const [utente, setUtente] = useState('');
     const [priorita, setPriorita] = useState('');
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
     const navigate = useNavigate()
     const dispatch = useDispatch();
-    //const user = useSelector((state) => state.userState)
+    const { issue } = useSelector((state) => state.issueState)
+
+    const fetchIssue = async () => {
+        try {
+            await dispatch(getIssues()).unwrap()
+        } catch (error) {
+            setErr(true)
+        }
+    }
+    useEffect(() => {
+        fetchIssue()
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
 
     const handleCreation = () => {
         setIsModalCreationOpen(true)
@@ -79,7 +87,7 @@ const Dashboard = () => {
         setIsModalCreationOpen(false)
     }
 
-    const getTicketCount = (status) => INITIAL_TICKETS.filter(t => t.status === status).length;
+    const getTicketCount = (status) => issue && issue.filter(t => t.stato === status).length;
 
     return (
         <Box
@@ -212,7 +220,7 @@ const Dashboard = () => {
                                 '&::-webkit-scrollbar': { width: '5px' },
                                 '&::-webkit-scrollbar-thumb': { bgcolor: '#c1c7d0', borderRadius: '10px' }
                             }}>
-                                {INITIAL_TICKETS.filter(t => t.status === status).map((ticket) => (
+                                {issue && issue.filter(t => t.stato === status).map((ticket) => (
                                     <Card
                                         key={ticket.id}
                                         sx={{
@@ -226,7 +234,7 @@ const Dashboard = () => {
                                         <CardActionArea onClick={() => handleOpenModal(ticket)}>
                                             <CardContent sx={{ p: 1.5, "&:last-child": { pb: 1.5 } }}>
                                                 <Typography variant="body2" sx={{ fontSize: '0.9rem', color: '#172b4d' }}>
-                                                    {ticket.title}
+                                                    {ticket.titolo}
                                                 </Typography>
                                                 <Typography variant="caption" sx={{ color: '#5e6c84', mt: 1, display: 'block' }}>
                                                     #{ticket.id}
@@ -244,6 +252,12 @@ const Dashboard = () => {
             <TicketModal open={isModalOpen} handleClose={handleCloseModal} ticket={selectedTicket} />
             <FormModal open={isModalOpenOfCreationTicket} handleClose={handleCloseCreateTicket}></FormModal>
             <CreationUserModal open={isModalCreationOpen} handleClose={handleCloseCreationModal}></CreationUserModal>
+            <DomicileBanner
+                severity={'Error'}
+                open={err}
+                title={'Errore'}
+                message={'Recupero dati issue fallito'}
+            />
         </Box>
     );
 };

@@ -8,7 +8,6 @@ export const appReducer = {
     appState: appSlice.reducer,
     userState: userSlice.reducer,
     issueState: issueSlice.reducer
-
 }
 
 export const store = configureStore({

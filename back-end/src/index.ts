@@ -1,6 +1,6 @@
 import express, { Application } from "express";
 import { authenticateToken } from "./middleware/authHandler";
-import { loginUtente, sendMail, userRegistration, insertCommento } from "./query";
+import { loginUtente, sendMail, userRegistration, insertCommento, getIssue, insertIssue } from "./query";
 import dotenv from 'dotenv';
 import cors from 'cors'
 
@@ -34,6 +34,19 @@ app.post("/user/registration", async (req, res) => {
     }
 })
 
+app.post("/user/registration/auth", authenticateToken, async (req, res) => {
+    try {
+        const response = await userRegistration(req.body)
+        res.status(200).json(response);
+    } catch (err: any) {
+        if (err.code && err.message) {
+            res.status(err.code).send(err.message);
+        } else {
+            res.status(500).send("Errore interno");
+        }
+    }
+})
+
 app.post("/user/sendMail", async (req, res) => {
     try {
         const response = await sendMail(req.body);
@@ -46,6 +59,34 @@ app.post("/user/sendMail", async (req, res) => {
         }
     }
 })
+
+app.post("/issue", async (req, res) => {
+    try {
+        // Recupera l'id utente (dal token o, se lo passi temporaneamente per test, dal body/query)
+        // Ad esempio, se lo passi nel body: req.body.id_utente
+
+        const nuovaIssue = await insertIssue(req.body);
+
+        // Restituiamo la issue creata con status 201 (Created)
+        res.status(201).json(nuovaIssue);
+    } catch (err: any) {
+        res.status(err.code || 500).send(err.message || "Errore interno");
+    }
+});
+
+app.get("/issue", async (req, res) => {
+    try {
+        const response = await getIssue();
+        res.status(200).json(response);
+    } catch (err: any) {
+        if (err.code && err.message) {
+            res.status(err.code).send(err.message);
+        } else {
+            res.status(500).send("Errore interno");
+        }
+    }
+})
+
 
 app.post("/user/login", async (req, res) => {
     try {

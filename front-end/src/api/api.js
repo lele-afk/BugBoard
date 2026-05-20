@@ -15,7 +15,7 @@ export const loginUser = async (loginData) => {
 
 export const insertIssue = async (newIssue) => {
     try {
-        const response = await _post('/issue/insert', newIssue)
+        const response = await _post('/issue', newIssue)
         return response
     } catch (error) {
         const message = error?.response?.data || "Errore imprevisto";

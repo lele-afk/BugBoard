@@ -14,7 +14,7 @@ const issueSlice = createSlice({
         setSelectedIssue: (state, action) => {
             state.selectedissue = action.payload
         },
-        setiIssueFiltered: (state, action) => {
+        setIssueFiltered: (state, action) => {
             state.issueFiltered = action.payload
         },
         clearSelectediIssue: (state) => {
@@ -26,15 +26,22 @@ const issueSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder.addCase(getIssues.fulfilled, (state, action) => {
-            state.issue = action.payload.issues
-            state.totalissue = action.payload.issues.length
+            console.log('action.payload :>> ', action.payload);
+            state.issue = action.payload
         });
         builder.addCase(issueInsert.fulfilled, (state, action) => {
-            state.loadingissue = true
-            state.issue = [...state.issue, ...action.payload]
+            state.issue = [...state.issue, action.payload];
+        })
+        builder.addCase(issueInsert.pending, (state) => {
+            // Quando la chiamata parte, il loading va a true
+            state.loadingIssue = true;
+        })
+        builder.addCase(issueInsert.rejected, (state) => {
+            // Se fallisce, spegniamo il loading
+            state.loadingIssue = false;
         })
         builder.addCase(commentoInsert.fulfilled, (state, action) => {
-            state.selectedissue = action.payload
+            state.selectedIssue = action.payload
         })
     }
 })

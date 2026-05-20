@@ -11,7 +11,7 @@ export const getIssues = createAsyncThunk("getIssue", async (req, { rejectWithVa
     }
 })
 
-export const issueInsert = createAsyncThunk("createIssue", async (req, { rejectWithValue }) => {
+export const issueInsert = createAsyncThunk("issueInsert", async (req, { rejectWithValue }) => {
     try {
         const response = await insertIssue(req)
         return response.data
