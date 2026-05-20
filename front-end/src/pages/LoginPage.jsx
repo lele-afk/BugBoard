@@ -18,6 +18,9 @@ const LoginPage = () => {
             email: credentials.email,
             password: credentials.password,
         }
+        console.log('userData :>> ', userData);
+        navigate('/dashboard')
+
 
         try {
             setErr(false);

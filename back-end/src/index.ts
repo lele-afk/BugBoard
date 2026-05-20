@@ -1,5 +1,5 @@
 import express, { Application } from "express";
-import { authenticateToken, isAdmin } from "./middleware/authHandler";
+import { authenticateToken } from "./middleware/authHandler";
 import { loginUtente, sendMail, userRegistration, insertCommento } from "./query";
 import dotenv from 'dotenv';
 import cors from 'cors'

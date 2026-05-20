@@ -14,7 +14,7 @@ const VerificationCode = () => {
         if (user.verificationCode === verificationCode) {
             try {
                 setErr(false)
-                await dispatch(userRegistration({ email: user.email, password: user.password })).unwrap();
+                await dispatch(userRegistration({ email: user.email, password: user.password, role: 'user' })).unwrap();
                 navigate("/")
             } catch (error) {
                 setErr(true)

@@ -24,6 +24,7 @@ import { useNavigate } from 'react-router-dom';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useDispatch } from 'react-redux'
 import { resetState } from '../state/user/userSlice';
+import CreationUserModal from '../component/CreationUserModal';
 const INITIAL_TICKETS = [
     { id: '1', title: 'Creare API Login', status: 'TO-DO', description: 'Implementare endpoint JWT' },
     { id: '2', title: 'Fix bug CSS Dashboard', status: 'DOING', description: 'Sistemare il padding delle colonne' },
@@ -38,12 +39,19 @@ const Dashboard = () => {
     const [selectedTicket, setSelectedTicket] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isModalOpenOfCreationTicket, setIsModalOpenOfCreationTicket] = useState(false);
+    const [isModalCreationOpen, setIsModalCreationOpen] = useState(false);
+
     const [utente, setUtente] = useState('');
     const [priorita, setPriorita] = useState('');
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
     const navigate = useNavigate()
     const dispatch = useDispatch();
+    //const user = useSelector((state) => state.userState)
+
+    const handleCreation = () => {
+        setIsModalCreationOpen(true)
+    }
 
     const handleOpenModal = (ticket) => {
         setSelectedTicket(ticket);
@@ -65,6 +73,10 @@ const Dashboard = () => {
     const handleLogout = () => {
         dispatch(resetState())
         navigate('/')
+    }
+
+    const handleCloseCreationModal = () => {
+        setIsModalCreationOpen(false)
     }
 
     const getTicketCount = (status) => INITIAL_TICKETS.filter(t => t.status === status).length;
@@ -140,6 +152,12 @@ const Dashboard = () => {
                                 endIcon={<AddIcon />}
                                 onClick={handleOpenCreateTicket}
                             ></StyledButton>
+                            {true && <StyledButton
+                                label={"Crea utente"}
+                                main={true}
+                                endIcon={<AddIcon />}
+                                onClick={handleCreation}
+                            ></StyledButton>}
                             <StyledButton
                                 label={"Logout"}
                                 main={false}
@@ -225,6 +243,7 @@ const Dashboard = () => {
 
             <TicketModal open={isModalOpen} handleClose={handleCloseModal} ticket={selectedTicket} />
             <FormModal open={isModalOpenOfCreationTicket} handleClose={handleCloseCreateTicket}></FormModal>
+            <CreationUserModal open={isModalCreationOpen} handleClose={handleCloseCreationModal}></CreationUserModal>
         </Box>
     );
 };
