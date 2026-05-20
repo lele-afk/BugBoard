@@ -20,7 +20,10 @@ import AddIcon from '@mui/icons-material/Add';
 import TicketModal from '../component/TicketModal';
 import StyledButton from '../component/StyledButton';
 import FormModal from '../component/FormModal';
-
+import { useNavigate } from 'react-router-dom';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { useDispatch } from 'react-redux'
+import { resetState } from '../state/user/userSlice';
 const INITIAL_TICKETS = [
     { id: '1', title: 'Creare API Login', status: 'TO-DO', description: 'Implementare endpoint JWT' },
     { id: '2', title: 'Fix bug CSS Dashboard', status: 'DOING', description: 'Sistemare il padding delle colonne' },
@@ -39,6 +42,8 @@ const Dashboard = () => {
     const [priorita, setPriorita] = useState('');
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+    const navigate = useNavigate()
+    const dispatch = useDispatch();
 
     const handleOpenModal = (ticket) => {
         setSelectedTicket(ticket);
@@ -56,6 +61,11 @@ const Dashboard = () => {
         setIsModalOpen(false);
         setSelectedTicket(null);
     };
+
+    const handleLogout = () => {
+        dispatch(resetState())
+        navigate('/')
+    }
 
     const getTicketCount = (status) => INITIAL_TICKETS.filter(t => t.status === status).length;
 
@@ -123,12 +133,20 @@ const Dashboard = () => {
                                 </Select>
                             </FormControl>
                         </Stack>
-                        <StyledButton
-                            label={"Crea ticket"}
-                            main={true}
-                            endIcon={<AddIcon />}
-                            onClick={handleOpenCreateTicket}
-                        ></StyledButton>
+                        <Stack direction="row" spacing={2}>
+                            <StyledButton
+                                label={"Crea ticket"}
+                                main={true}
+                                endIcon={<AddIcon />}
+                                onClick={handleOpenCreateTicket}
+                            ></StyledButton>
+                            <StyledButton
+                                label={"Logout"}
+                                main={false}
+                                endIcon={<ArrowBackIcon />}
+                                onClick={handleLogout}
+                            ></StyledButton></Stack>
+
                     </Stack>
                 </Box>
 
