@@ -14,7 +14,7 @@ async function userLogin(filters: { email: string; }) {
         })
         return user
     } catch (error) {
-        throw { code: 500, message: "Errore recupero dati." }
+        throw { code: 500, message: error }
     }
 }
 
@@ -25,7 +25,7 @@ async function checkUser(filters: { email: string; }) {
         })
         return user
     } catch (error) {
-        throw { code: 500, message: "Errore recupero dati." }
+        throw { code: 500, message: error }
     }
 }
 
@@ -35,7 +35,7 @@ export async function userRegistration(newUser: InsertUtenti): Promise<Registrat
 
     try {
         const userRegister: SelectUtenti[] = await database.insert(utente).values(registrationUserData).returning();
-        const userRegistrated = { idUser: userRegister[0].id_utente, email: userRegister[0].email, hashedPassword: userRegister[0].password, nome: userRegister[0].nome, cognome: userRegister[0].cognome, role: userRegister[0].role, data_registrazione: new Date() }
+        const userRegistrated = { idUser: userRegister[0].id_utente, email: userRegister[0].email, hashedPassword: userRegister[0].password, nome: userRegister[0].nome, cognome: userRegister[0].cognome, role: userRegister[0].role }
         return userRegistrated;
     } catch (error) {
         throw { code: 500, message: "Errore recupero dati." }

@@ -53,7 +53,7 @@ const CardForm = ({
             setPasswordError(true);
             setPasswordErrorMessage('La password dovrebbe essere lunga almeno 6 caratteri.');
             isValid = false;
-        } else if (password !== rePassword) {
+        } else if (withPrivateData && (password !== rePassword)) {
             setPasswordError(true);
             setPasswordErrorMessage('Le password non corrispondono.');
             isValid = false;
@@ -226,7 +226,7 @@ const CardForm = ({
                                             }}
                                         />
                                     </FormControl>
-                                    <FormControl>
+                                    {withPrivateData && <FormControl>
                                         <FormLabel htmlFor="repassword" sx={{ fontWeight: 'bold' }}>Ripeti la password</FormLabel>
                                         <TextField
                                             name="repassword"
@@ -255,7 +255,7 @@ const CardForm = ({
                                                 }
                                             }}
                                         />
-                                    </FormControl>
+                                    </FormControl>}
                                 </>
                             )}
                         </Stack>

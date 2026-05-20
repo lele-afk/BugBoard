@@ -5,13 +5,21 @@ import * as type from "drizzle-orm/pg-core";
 export const ruoloEnum = pgEnum('ruolo_enum', ["user", "admin"]);
 
 export const utente = pgTable('utente', {
-    id_utente: type.integer().notNull().primaryKey().generatedAlwaysAsIdentity(),
-    nome: type.varchar({ length: 50 }).notNull(),
-    cognome: type.varchar({ length: 50 }).notNull(),
-    email: type.varchar({ length: 100 }).notNull().unique(),
-    password: type.varchar({ length: 255 }).notNull(),
+    // Se usi SERIAL nel DB, in Drizzle basta .primaryKey() senza generatedAlwaysAsIdentity
+    id_utente: type.integer('id_utente').notNull().primaryKey(),
+
+    // Aggiornata la lunghezza a 100 come da DB
+    nome: type.varchar('nome', { length: 100 }).notNull(),
+    cognome: type.varchar('cognome', { length: 100 }).notNull(),
+
+    // Aggiornata la lunghezza a 255 come da DB
+    email: type.varchar('email', { length: 255 }).notNull().unique(),
+    password: type.varchar('password', { length: 255 }).notNull(),
+
     role: ruoloEnum('role').notNull().default("user"),
-    data_registrazione: type.timestamp().defaultNow()
+
+    // CORREZIONE CHIAVE: Mappiamo la proprietà su 'created_at' (Postgres non fa caso a MAIUSCOLE/minuscole nei nomi virgolettati se scritti così)
+    data_registrazione: type.timestamp('created_at').defaultNow().notNull()
 });
 
 export const relazioneUtenteIssue = relations(utente, ({ many, one }) => ({

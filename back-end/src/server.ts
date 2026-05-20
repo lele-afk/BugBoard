@@ -5,7 +5,7 @@ import * as schema from './db/schemas';
 const pool = new Pool({
     user: 'postgres',
     host: 'localhost',
-    database: 'MemeMuseum',
+    database: 'BugBoard',
     password: 'root',
     port: 5432,
 });

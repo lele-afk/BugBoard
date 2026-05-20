@@ -19,7 +19,7 @@ const LoginPage = () => {
             password: credentials.password,
         }
         console.log('userData :>> ', userData);
-        navigate('/dashboard')
+        // navigate('/dashboard')
 
 
         try {
