@@ -36,7 +36,6 @@ const TicketModal = ({ open, handleClose, ticket }) => {
 
                 <Box sx={{ mt: 4, display: 'flex', justifyContent: 'flex-end' }}>
                     <StyledButton onClick={handleClose} label='Chiudi'>
-                        Chiudi
                     </StyledButton>
                 </Box>
             </Box>

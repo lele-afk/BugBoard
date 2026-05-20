@@ -8,7 +8,11 @@ import {
     Stack,
     Chip,
     useTheme,
-    useMediaQuery
+    useMediaQuery,
+    FormControl,
+    InputLabel,
+    Select,
+    MenuItem
 } from '@mui/material';
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 import PriorityHighIcon from '@mui/icons-material/PriorityHigh';
@@ -31,7 +35,8 @@ const Dashboard = () => {
     const [selectedTicket, setSelectedTicket] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isModalOpenOfCreationTicket, setIsModalOpenOfCreationTicket] = useState(false);
-
+    const [utente, setUtente] = useState('');
+    const [priorita, setPriorita] = useState('');
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
@@ -85,18 +90,38 @@ const Dashboard = () => {
                         justifyContent={{ xs: 'flex-start', sm: 'space-between' }}
                     >
 
-                        <Stack direction="row" spacing={1}>
-                            <StyledButton
-                                label={"Utente"}
-                                main={true}
-                                endIcon={<PersonOutlineIcon />}
-                            >
-                            </StyledButton>
-                            <StyledButton
-                                label={"Priorità"}
-                                main={true}
-                                endIcon={<PriorityHighIcon />}
-                            ></StyledButton>
+                        <Stack direction="row" spacing={2}>
+                            <FormControl size="small" sx={{ minWidth: 200 }}>
+                                <InputLabel id="select-utente-label">Utente</InputLabel>
+                                <Select
+                                    labelId="select-utente-label"
+                                    id="select-utente"
+                                    value={utente}
+                                    label="Utente"
+                                    onChange={(e) => setUtente(e.target.value)}
+                                    endAdornment={<PersonOutlineIcon sx={{ marginRight: 3, color: 'action.active' }} />}
+                                >
+                                    <MenuItem value="utente1">Utente 1</MenuItem>
+                                    <MenuItem value="utente2">Utente 2</MenuItem>
+                                    <MenuItem value="utente3">Utente 3</MenuItem>
+                                </Select>
+                            </FormControl>
+
+                            <FormControl size="small" sx={{ minWidth: 120 }}>
+                                <InputLabel id="select-priorita-label">Priorità</InputLabel>
+                                <Select
+                                    labelId="select-priorita-label"
+                                    id="select-priorita"
+                                    value={priorita}
+                                    label="Priorità"
+                                    onChange={(e) => setPriorita(e.target.value)}
+                                    endAdornment={<PriorityHighIcon sx={{ marginRight: 3, color: 'action.active' }} />}
+                                >
+                                    <MenuItem value="alta">Alta</MenuItem>
+                                    <MenuItem value="media">Media</MenuItem>
+                                    <MenuItem value="bassa">Bassa</MenuItem>
+                                </Select>
+                            </FormControl>
                         </Stack>
                         <StyledButton
                             label={"Crea ticket"}
