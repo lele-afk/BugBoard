@@ -1,16 +1,31 @@
-import React, { } from "react";
+import React, { useState } from "react";
 import { Box, Divider, Grid, Stack, Typography } from '@mui/material';
 import StyledButton from '../component/StyledButton'
 import CardForm from '../component/CardForm';
 import { useNavigate } from 'react-router-dom';
-// import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
+import { userLogin } from '../state/user/userActions'
+import DomicileBanner from "../component/DomicileBanner";
 const LoginPage = () => {
-    // const { logged } = useSelector(state => state.userState)
+    const { registrationSucces } = useSelector(state => state.userState)
     const navigate = useNavigate()
+    const dispatch = useDispatch();
+    const [err, setErr] = useState(false)
 
-    const handleLogin = () => {
 
-        navigate('/dashboard')
+    const handleLogin = async (credentials) => {
+        const userData = {
+            email: credentials.email,
+            password: credentials.password,
+        }
+
+        try {
+            setErr(false);
+            await dispatch(userLogin(userData)).unwrap()
+            navigate('/dashboard')
+        } catch (err) {
+            setErr(true)
+        }
     }
 
     const navigateToRegistration = () => {
@@ -72,7 +87,18 @@ const LoginPage = () => {
                 </Box>
             </Stack>
         </Grid>
-
+        <DomicileBanner
+            severity={'Error'}
+            open={err}
+            title={'Errore'}
+            message={'Login fallito, utente non esistente o le credenziali non sono corrette'}
+        />
+        <DomicileBanner
+            severity={'Success'}
+            open={registrationSucces}
+            title={'Conferma registrazione'}
+            message={'Registrazione completata con successo'}
+        />
     </Grid>
 }
 

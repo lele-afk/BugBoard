@@ -17,13 +17,16 @@ const CardForm = ({ withPrivateData = false,
     textOfDescription = 'Descrizione',
     textOfButtonOfSubmit = 'Bottone',
     onlyVerificationCode = false,
-
     onBack,
     onSubmit }) => {
 
     const [showPassword, setShowPassword] = useState(false);
     const [showRePassword, setShowRePassword] = useState(false);
-
+    const [passwordError, setPasswordError] = useState(false);
+    const [passwordErrorMessage, setPasswordErrorMessage] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [verificationCode, setVerificationCode] = useState('');
     const handleClickShowPassword = () => setShowPassword((show) => !show);
 
     const handleClickShowRePassword = () => setShowRePassword((showRePassword) => !showRePassword);
@@ -37,13 +40,29 @@ const CardForm = ({ withPrivateData = false,
     };
 
     const validateInputs = () => {
-        /* const password = document.getElementById('password');
-       const email = document.getElementById('email'); */
-        return true
+        const password = document.getElementById('password');
+        const rePassword = document.getElementById('re-password');
+        const email = document.getElementById('email');
+        setEmail(email)
+        let isValid = true;
+
+        if (password.length < 6) {
+            setPasswordError(true);
+            setPasswordErrorMessage('La password dovrebbe essere lunga almeno 6 caratteri.');
+            isValid = false;
+        } else if (password !== rePassword) {
+            setPasswordError(true);
+            setPasswordErrorMessage('Le password non corrispondono.');
+            isValid = false;
+        } else {
+            setPasswordError(false);
+            setPasswordErrorMessage('');
+        }
+        setPassword(password)
+        return isValid
     }
 
     const handleSubmit = (event) => {
-        console.log('ciao :>> ');
         event.preventDefault();
 
         if (!validateInputs()) {
@@ -51,7 +70,13 @@ const CardForm = ({ withPrivateData = false,
         }
 
         if (onSubmit) {
-            onSubmit();
+            setPasswordError(false);
+            setPasswordErrorMessage('');
+            if (onlyVerificationCode) {
+                onSubmit({ verificationCode });
+            } else {
+                onSubmit({ email, password });
+            }
         }
     }
 
@@ -64,8 +89,6 @@ const CardForm = ({ withPrivateData = false,
             alignItems: 'center',
             minHeight: '100vh',
             width: '100%',
-
-
         }}
     >
         <Stack spacing={3}
@@ -111,6 +134,7 @@ const CardForm = ({ withPrivateData = false,
                                 required
                                 fullWidth
                                 id="verificationCode"
+                                onChange={(e) => setVerificationCode(e.target.value)}
                                 sx={{ backgroundColor: 'white', mb: 3 }}
                             />
                         </FormControl> : <>
@@ -143,6 +167,7 @@ const CardForm = ({ withPrivateData = false,
                                     required
                                     fullWidth
                                     id="email"
+
                                     sx={{ backgroundColor: 'white', mb: 3 }}
                                 />
                             </FormControl>
@@ -153,6 +178,9 @@ const CardForm = ({ withPrivateData = false,
                                     required
                                     fullWidth
                                     id="password"
+                                    error={passwordError}
+                                    helperText={passwordErrorMessage}
+                                    color={passwordError ? 'error' : 'primary'}
                                     sx={{ backgroundColor: 'white', mb: 3 }}
                                     type={showPassword ? 'text' : 'password'}
                                     slotProps={{
@@ -160,7 +188,6 @@ const CardForm = ({ withPrivateData = false,
                                             endAdornment:
                                                 <InputAdornment position="end">
                                                     <IconButton
-
                                                         onClick={handleClickShowPassword}
                                                         onMouseDown={handleMouseDownPassword}
                                                         onMouseUp={handleMouseUpPassword}
