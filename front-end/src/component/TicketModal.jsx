@@ -14,6 +14,7 @@ const style = {
     width: 550,
     maxHeight: '90vh',
     overflowY: 'auto',
+    overflowX: 'hidden',
     bgcolor: 'background.paper',
     boxShadow: 24,
     p: 4,
@@ -29,11 +30,8 @@ const NEXT_STATUS_MAP = {
 const TicketModal = ({ open, handleClose, ticket: initialTicket }) => {
     const dispatch = useDispatch();
 
-    // 1. Recuperiamo lo stato dell'utente
     const { commentoLoaded, idUtente } = useSelector((state) => state.userState);
 
-    // 2. AGGIORNAMENTO IN TEMPO REALE: Selezioniamo il ticket direttamente da Redux 
-    // in modo che qualsiasi modifica (es. nuovi commenti inseriti nel reducer) ri-renderizzi subito la modale.
     const ticket = useSelector((state) =>
         state.issueState?.issue?.find(i => i.id_issue === initialTicket?.id_issue) || initialTicket
     );
@@ -43,12 +41,10 @@ const TicketModal = ({ open, handleClose, ticket: initialTicket }) => {
 
     useEffect(() => {
         if (ticket) {
-            // Normalizziamo 'in_progress' proveniente dal DB per la stringa locale 'inprogress'
             setCurrentStatus(ticket.stato === 'in_progress' ? 'inprogress' : ticket.stato);
         }
     }, [ticket]);
 
-    // EFFETTO AUTO-HIDE: Chiude l'alert automaticamente dopo 4 secondi
     useEffect(() => {
         if (commentoLoaded) {
             const timer = setTimeout(() => {
@@ -63,15 +59,11 @@ const TicketModal = ({ open, handleClose, ticket: initialTicket }) => {
     const handleStatusChange = () => {
         const nextStatus = NEXT_STATUS_MAP[currentStatus];
         if (nextStatus) {
-            // Se lo stato successivo è 'inprogress', lo mappiamo come 'in_progress' per rispettare Drizzle
             const backendStatus = nextStatus === 'inprogress' ? 'in_progress' : nextStatus;
-
             const payload = {
                 id_issue: ticket.id_issue,
                 stato: backendStatus
             };
-
-            // Eseguiamo il dispatch verso l'azione asincrona di Redux
             dispatch(issueChangeStatus(payload));
         }
     };
@@ -91,6 +83,34 @@ const TicketModal = ({ open, handleClose, ticket: initialTicket }) => {
 
     const nextStatus = NEXT_STATUS_MAP[currentStatus];
     const listaCommenti = ticket.commenti || [];
+
+    const imageUrl = ticket.immagine || null
+
+
+    const handleOpenBase64Image = () => {
+        if (!imageUrl) return;
+
+        try {
+            const parts = imageUrl.split(',');
+            const mimeType = parts[0].match(/:(.*?);/)[1];
+            const base64Data = parts[1];
+
+            const byteCharacters = atob(base64Data);
+            const byteNumbers = new Array(byteCharacters.length);
+            for (let i = 0; i < byteCharacters.length; i++) {
+                byteNumbers[i] = byteCharacters.charCodeAt(i);
+            }
+            const byteArray = new Uint8Array(byteNumbers);
+
+            const blob = new Blob([byteArray], { type: mimeType });
+
+            const blobUrl = URL.createObjectURL(blob);
+
+            window.open(blobUrl, '_blank');
+        } catch (error) {
+            console.error("Impossibile aprire l'immagine Base64:", error);
+        }
+    };
 
     return (
         <Modal open={open} onClose={handleClose}>
@@ -137,6 +157,48 @@ const TicketModal = ({ open, handleClose, ticket: initialTicket }) => {
                 <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
                     {ticket.descrizione || "Nessuna descrizione fornita."}
                 </Typography>
+                {imageUrl && (
+                    <>
+                        <Divider sx={{ my: 2 }} />
+                        <Typography variant="body1" sx={{ fontWeight: 'bold', mb: 1 }}>
+                            Allegato:
+                        </Typography>
+                        <Box
+                            sx={{
+                                maxWidth: '100%',
+                                boxSizing: 'border-box',
+                                maxHeight: '250px',
+                                overflow: 'hidden',
+                                borderRadius: 1.5,
+                                border: '1px solid',
+                                borderColor: 'divider',
+                                display: 'flex',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                                bgcolor: 'action.hover',
+                                mb: 2
+                            }}
+                        >
+                            <Box
+                                component="img"
+                                src={imageUrl}
+                                alt={`Allegato del ticket ${ticket.id_issue}`}
+                                sx={{
+                                    maxWidth: '100%',
+                                    height: 'auto',
+                                    maxHeight: '250px',
+                                    objectFit: 'contain',
+                                    cursor: 'pointer',
+                                    transition: 'transform 0.2s',
+                                    '&:hover': {
+                                        transform: 'scale(1.02)'
+                                    }
+                                }}
+                                onClick={handleOpenBase64Image}
+                            />
+                        </Box>
+                    </>
+                )}
 
                 <Divider sx={{ my: 2 }} />
 
@@ -151,7 +213,7 @@ const TicketModal = ({ open, handleClose, ticket: initialTicket }) => {
                         />
                     ) : (
                         <Typography variant="caption" color="success.main">
-                            ✓ Questo ticket è completato (DONE).
+                            Questo ticket è completato (DONE).
                         </Typography>
                     )}
                 </Box>
@@ -169,7 +231,7 @@ const TicketModal = ({ open, handleClose, ticket: initialTicket }) => {
                                 <Box display="flex" justifyContent="space-between">
                                     <Typography variant="caption" sx={{ fontWeight: 'bold' }}>{commento.utente?.nome
                                         ? commento.utente.nome
-                                        : (commento.id_utente === idUtente ? commento?.utente.nome : `Utente #${commento.id_utente}`)
+                                        : (commento.id_utente === idUtente ? commento?.utente?.nome : `Utente #${commento.id_utente}`)
                                     }</Typography>
                                     <Typography variant="caption" color="text.secondary">
                                         {commento.created_at ? new Date(commento.created_at).toLocaleString() : ''}
