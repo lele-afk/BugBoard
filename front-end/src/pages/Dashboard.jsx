@@ -256,6 +256,7 @@ const Dashboard = () => {
                 severity={'error'}
                 open={err}
                 title={'Errore'}
+                handleClose={() => setErr(false)}
                 message={'Recupero dati issue fallito'}
             />
             <DomicileBanner

@@ -6,6 +6,8 @@ import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux'
 import { userLogin } from '../state/user/userActions'
 import DomicileBanner from "../component/DomicileBanner";
+import { resetRegistrationFlag } from "../state/user/userSlice";
+
 const LoginPage = () => {
     const { registrationSucces } = useSelector(state => state.userState)
     const navigate = useNavigate()
@@ -89,14 +91,16 @@ const LoginPage = () => {
             </Stack>
         </Grid>
         <DomicileBanner
-            severity={'Error'}
+            severity={'error'}
             open={err}
+            handleClose={() => setErr(false)}
             title={'Errore'}
             message={'Login fallito, utente non esistente o le credenziali non sono corrette'}
         />
         <DomicileBanner
             severity={'Success'}
             open={registrationSucces}
+            handleClose={() => dispatch(resetRegistrationFlag())}
             title={'Conferma registrazione'}
             message={'Registrazione completata con successo'}
         />

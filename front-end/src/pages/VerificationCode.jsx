@@ -38,8 +38,9 @@ const VerificationCode = () => {
                 onBack={handleBack}
                 onSubmit={handleVerificationCodeSubmit} />
             <DomicileBanner
-                severity={'Error'}
+                severity={'err'}
                 open={err}
+                handleClose={() => setErr(false)}
                 title={'Errore'}
                 message={'Registrazione fallita'}
             /></>
