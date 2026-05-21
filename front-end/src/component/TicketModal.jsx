@@ -39,14 +39,19 @@ const TicketModal = ({ open, handleClose, ticket: initialTicket }) => {
     const [currentStatus, setCurrentStatus] = useState(ticket?.stato || 'todo');
     const [newComment, setNewComment] = useState("");
 
+    // AGGIUNTO: Stato locale per gestire la comparsa e il testo degli errori di backend
+    const [errorMessage, setErrorMessage] = useState("");
+
     useEffect(() => {
         if (ticket) {
             setCurrentStatus(ticket.stato === 'in_progress' ? 'inprogress' : ticket.stato);
         }
     }, [ticket]);
 
+    // Gestione del timer di chiusura automatica per il successo
     useEffect(() => {
         if (commentoLoaded) {
+            setErrorMessage(""); // Resetta l'errore se l'azione successiva va a buon fine
             const timer = setTimeout(() => {
                 dispatch(resetCommentoLoaded());
             }, 4000);
@@ -54,9 +59,20 @@ const TicketModal = ({ open, handleClose, ticket: initialTicket }) => {
         }
     }, [commentoLoaded, dispatch]);
 
+    // AGGIUNTO: Timer di chiusura automatica per il banner di errore (4 secondi)
+    useEffect(() => {
+        if (errorMessage) {
+            const timer = setTimeout(() => {
+                setErrorMessage("");
+            }, 4000);
+            return () => clearTimeout(timer);
+        }
+    }, [errorMessage]);
+
     if (!ticket) return null;
 
-    const handleStatusChange = () => {
+    // Gestione cambio stato con blocco try/catch
+    const handleStatusChange = async () => {
         const nextStatus = NEXT_STATUS_MAP[currentStatus];
         if (nextStatus) {
             const backendStatus = nextStatus === 'inprogress' ? 'in_progress' : nextStatus;
@@ -64,28 +80,43 @@ const TicketModal = ({ open, handleClose, ticket: initialTicket }) => {
                 id_issue: ticket.id_issue,
                 stato: backendStatus
             };
-            dispatch(issueChangeStatus(payload));
+
+            try {
+                setErrorMessage(""); // Resetta errori precedenti
+                // .unwrap() estrae il risultato o lancia l'eccezione se la promise viene rifiutata
+                await dispatch(issueChangeStatus(payload)).unwrap();
+            } catch (error) {
+                console.error("Errore avanzamento stato:", error);
+                setErrorMessage("Impossibile aggiornare lo stato del ticket. Riprova più tardi.");
+            }
         }
     };
 
-    const handleAddComment = () => {
+    // Gestione aggiunta commento con blocco try/catch
+    const handleAddComment = async () => {
         if (!newComment.trim()) return;
 
         const payload = {
             id_issue: ticket.id_issue,
             id_utente: idUtente || ticket.id_utente,
-            commento: newComment
+            commento: newComment.trim()
         };
 
-        dispatch(commentoInsert(payload));
-        setNewComment("");
+        try {
+            setErrorMessage(""); // Resetta errori precedenti
+            if (commentoLoaded) dispatch(resetCommentoLoaded());
+
+            await dispatch(commentoInsert(payload)).unwrap();
+            setNewComment("");
+        } catch (error) {
+            console.error("Errore inserimento commento:", error);
+            setErrorMessage("Impossibile aggiungere il commento. Riprova più tardi.");
+        }
     };
 
     const nextStatus = NEXT_STATUS_MAP[currentStatus];
     const listaCommenti = ticket.commenti || [];
-
-    const imageUrl = ticket.immagine || null
-
+    const imageUrl = ticket.immagine || null;
 
     const handleOpenBase64Image = () => {
         if (!imageUrl) return;
@@ -101,9 +132,7 @@ const TicketModal = ({ open, handleClose, ticket: initialTicket }) => {
                 byteNumbers[i] = byteCharacters.charCodeAt(i);
             }
             const byteArray = new Uint8Array(byteNumbers);
-
             const blob = new Blob([byteArray], { type: mimeType });
-
             const blobUrl = URL.createObjectURL(blob);
 
             window.open(blobUrl, '_blank');
@@ -112,8 +141,15 @@ const TicketModal = ({ open, handleClose, ticket: initialTicket }) => {
         }
     };
 
+    // Reset completo degli stati di notifica alla chiusura manuale del modal
+    const handleCloseModal = () => {
+        setErrorMessage("");
+        if (commentoLoaded) dispatch(resetCommentoLoaded());
+        handleClose();
+    };
+
     return (
-        <Modal open={open} onClose={handleClose}>
+        <Modal open={open} onClose={handleCloseModal}>
             <Box sx={style}>
                 <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ mb: 1 }}>
                     <Typography variant="overline" color="text.secondary">
@@ -126,6 +162,7 @@ const TicketModal = ({ open, handleClose, ticket: initialTicket }) => {
                     />
                 </Box>
 
+                {/* Banner di Successo */}
                 <Collapse in={commentoLoaded}>
                     <Alert
                         severity="success"
@@ -138,6 +175,19 @@ const TicketModal = ({ open, handleClose, ticket: initialTicket }) => {
                     </Alert>
                 </Collapse>
 
+                {/* AGGIUNTO: Banner di Errore speculare basato sullo stato locale */}
+                <Collapse in={Boolean(errorMessage)}>
+                    <Alert
+                        severity="error"
+                        variant="outlined"
+                        onClose={() => setErrorMessage("")}
+                        sx={{ mb: 2, borderRadius: 1.5 }}
+                    >
+                        <AlertTitle sx={{ fontWeight: 'bold' }}>Errore</AlertTitle>
+                        {errorMessage}
+                    </Alert>
+                </Collapse>
+
                 <Typography variant="h5" component="h2" gutterBottom>
                     {ticket.titolo}
                 </Typography>
@@ -145,7 +195,17 @@ const TicketModal = ({ open, handleClose, ticket: initialTicket }) => {
                 <Box display="flex" gap={1} mb={2} flexWrap="wrap">
                     <Chip label={`Priorità: ${ticket.priorita?.toUpperCase()}`} size="small" variant="outlined" />
                     <Typography variant="caption" color="text.secondary" sx={{ alignSelf: 'center' }}>
-                        Creato il: {new Date(ticket.created_at).toLocaleDateString()}
+                        Creato il: {ticket.created_at
+                            ? new Date(ticket.created_at).toLocaleString('it-IT', {
+                                timeZone: 'UTC',
+                                day: '2-digit',
+                                month: '2-digit',
+                                year: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                            })
+                            : '—'
+                        }
                     </Typography>
                 </Box>
 
@@ -234,7 +294,10 @@ const TicketModal = ({ open, handleClose, ticket: initialTicket }) => {
                                         : (commento.id_utente === idUtente ? commento?.utente?.nome : `Utente #${commento.id_utente}`)
                                     }</Typography>
                                     <Typography variant="caption" color="text.secondary">
-                                        {commento.created_at ? new Date(commento.created_at).toLocaleString() : ''}
+                                        {commento.created_at
+                                            ? new Date(commento.created_at).toLocaleString('it-IT', { timeZone: 'UTC' })
+                                            : ''
+                                        }
                                     </Typography>
                                 </Box>
                                 <Typography variant="body2" sx={{ mt: 0.5 }}>{commento.commento}</Typography>
@@ -259,7 +322,7 @@ const TicketModal = ({ open, handleClose, ticket: initialTicket }) => {
                 </Box>
 
                 <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
-                    <StyledButton onClick={handleClose} main={false} label='Chiudi' />
+                    <StyledButton onClick={handleCloseModal} main={false} label='Chiudi' />
                 </Box>
             </Box>
         </Modal>
