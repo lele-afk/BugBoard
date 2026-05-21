@@ -23,7 +23,7 @@ import FormModal from '../component/FormModal';
 import { useNavigate } from 'react-router-dom';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useDispatch, useSelector } from 'react-redux'
-import { resetState } from '../state/user/userSlice';
+import { resetState, resetRegistrationFlag } from '../state/user/userSlice';
 import CreationUserModal from '../component/CreationUserModal';
 import { getIssues } from '../state/issue/issueAction';
 import DomicileBanner from '../component/DomicileBanner';
@@ -318,6 +318,13 @@ const Dashboard = () => {
                 handleClose={() => dispatch(clearAlertForCreateIssue())}
                 title={'Successo'}
                 message={'Inserimento issue completato'}
+            />
+            <DomicileBanner
+                severity={'success'}
+                open={user.registrationSuccess}
+                handleClose={() => dispatch(resetRegistrationFlag())}
+                title={'Conferma registrazione'}
+                message={'Registrazione completata con successo'}
             />
         </Box>
     );

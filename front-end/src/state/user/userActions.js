@@ -1,5 +1,5 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { insertCommento, loginUser, registrationUser, sendMailApi } from "../../api/api";
+import { insertCommento, loginUser, registrationUser, registrationUserWithAuth, sendMailApi } from "../../api/api";
 
 export const userLogin = createAsyncThunk("loginUser", async (req, { rejectWithValue }) => {
     try {
@@ -27,6 +27,16 @@ export const userRegistration = createAsyncThunk("registrationUser", async (req,
     }
 });
 
+export const userRegistrationWithAuth = createAsyncThunk("registrationUserWithAuth", async (req, { rejectWithValue }) => {
+    try {
+
+        const response = await registrationUserWithAuth(req);
+        return response.data;
+    } catch (error) {
+        return rejectWithValue(error);
+    }
+});
+
 
 export const commentoInsert = createAsyncThunk("commentoInsert", async (req, { rejectWithValue }) => {
     try {
@@ -40,11 +50,11 @@ export const sendMail = createAsyncThunk("sendMail", async (req, { rejectWithVal
     try {
         const response = await sendMailApi(req);
         return {
-            nome: req.nome,          // <-- Recuperiamo il nome
-            cognome: req.cognome,    // <-- Recuperiamo il cognome
+            nome: req.nome,
+            cognome: req.cognome,
             email: req.email,
             password: req.password,
-            verificationCode: response.data.codeVerification // Allineato con la risposta del backend
+            verificationCode: response.data.codeVerification
         };
     } catch (error) {
         return rejectWithValue(error);

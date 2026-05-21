@@ -10,7 +10,7 @@ export const prioritaEnum = pgEnum('priorita_enum', ["low", "medium", "high"]);
 
 
 export const utente = pgTable('utente', {
-    id_utente: type.integer('id_utente').notNull().primaryKey(),
+    id_utente: type.integer('id_utente').notNull().primaryKey().generatedAlwaysAsIdentity(),
     nome: type.varchar('nome', { length: 100 }).notNull(),
     cognome: type.varchar('cognome', { length: 100 }).notNull(),
     email: type.varchar('email', { length: 255 }).notNull().unique(),

@@ -74,6 +74,6 @@ VALUES (
     'Admin',
     'System',
     'admin@sistema.it',
-    '$2b$12$HASH_DA_SOSTITUIRE_CON_BCRYPT',
+    '$2a$12$j6nYpo01iwP3/eikr7YkWun72bDKpxJkwRYIhLi3YLvEMdDMxrYAC' ## test1234
     'admin'
-);s
+);

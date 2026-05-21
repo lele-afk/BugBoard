@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { sendMail, userLogin, userRegistration, commentoInsert } from "./userActions";
+import { sendMail, userLogin, userRegistration, commentoInsert, userRegistrationWithAuth } from "./userActions";
 
 const initialState = {
     idUtente: null,
@@ -54,10 +54,8 @@ const userSlice = createSlice({
             state.mailSended = true
         })
         builder.addCase(userRegistration.fulfilled, (state, action) => {
-            // 1. Impostiamo il flag di successo a true
             state.registrationSuccess = true;
 
-            // 2. Svuotiamo i dati temporanei di registrazione (consigliato per sicurezza)
             state.nome = "";
             state.cognome = "";
             state.email = "";
@@ -66,7 +64,18 @@ const userSlice = createSlice({
             state.loading = false;
             state.error = null;
 
-            // NOTA: Nessun "return" qui sotto! Modificiamo il draft direttamente.
+        });
+        builder.addCase(userRegistrationWithAuth.fulfilled, (state, action) => {
+            state.registrationSuccess = true;
+
+            state.nome = "";
+            state.cognome = "";
+            state.email = "";
+            state.password = "";
+            state.verificationCode = null;
+            state.loading = false;
+            state.error = null;
+
         });
         builder.addCase(commentoInsert.fulfilled, (state, action) => {
             state.commentoLoaded = true

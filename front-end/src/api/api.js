@@ -58,6 +58,25 @@ export const registrationUser = async (newUser) => {
     }
 }
 
+export const registrationUserWithAuth = async (newUser) => {
+    try {
+        const token = localStorage.getItem("AuthToken");
+
+        const response = await _post('/user/registration/auth', newUser, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
+        return response;
+    } catch (error) {
+        const message = error?.response?.data || "Errore imprevisto";
+        const code = error?.response?.status || 500;
+
+        // eslint-disable-next-line no-throw-literal
+        throw { code, message };
+    }
+}
+
 export const sendMailApi = async (newUser) => {
     try {
         const response = await _post('/user/sendMail', newUser);

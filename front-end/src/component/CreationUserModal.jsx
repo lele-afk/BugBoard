@@ -14,13 +14,16 @@ import {
     InputAdornment,
     IconButton,
     FormControlLabel,
-    Checkbox
+    Checkbox,
+    Collapse,
+    Alert,
+    AlertTitle
 } from '@mui/material';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { useDispatch } from 'react-redux';
 import StyledButton from './StyledButton';
-import { userRegistration } from '../state/user/userActions';
+import { userRegistrationWithAuth } from '../state/user/userActions';
 
 function CreationUserModal({ open, handleClose }) {
     const theme = useTheme();
@@ -39,22 +42,29 @@ function CreationUserModal({ open, handleClose }) {
 
     const [passwordError, setPasswordError] = useState(false);
     const [passwordErrorMessage, setPasswordErrorMessage] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
+    const [registrationError, setRegistrationError] = useState(false);
 
     const handleClickShowPassword = () => setShowPassword((show) => !show);
     const handleClickShowRePassword = () => setShowRePassword((showRePassword) => !showRePassword);
     const handleMouseDownPassword = (event) => event.preventDefault();
 
     const validateInputs = () => {
-        if (password.length < 6) {
+        const cleanPassword = password.trim();
+        const cleanRePassword = rePassword.trim();
+
+        if (cleanPassword.length < 6) {
             setPasswordError(true);
-            setPasswordErrorMessage('La password deve essere di almeno 6 caratteri.');
+            setPasswordErrorMessage('La password deve contenere almeno 6 caratteri.');
             return false;
         }
-        if (password !== rePassword) {
+        if (cleanPassword !== cleanRePassword) {
             setPasswordError(true);
-            setPasswordErrorMessage('Le password non corrispondono.');
+            setPasswordErrorMessage('Le password inserite non corrispondono.');
             return false;
         }
+
         setPasswordError(false);
         setPasswordErrorMessage('');
         return true;
@@ -62,24 +72,29 @@ function CreationUserModal({ open, handleClose }) {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
+        setRegistrationError(false);
 
-        if (!validateInputs()) {
+        if (!validateInputs() || isSubmitting) {
             return;
         }
 
         const newUserPayload = {
-            nome,
-            cognome,
-            email,
-            password,
+            nome: nome.trim(),
+            cognome: cognome.trim(),
+            email: email.trim(),
+            password: password,
             role: isAdmin ? 'admin' : 'user'
         };
 
         try {
-            await dispatch(userRegistration(newUserPayload)).unwrap();
+            setIsSubmitting(true);
+            await dispatch(userRegistrationWithAuth(newUserPayload)).unwrap();
             handleCloseDialog();
         } catch (error) {
             console.error("Errore durante la creazione dell'utente:", error);
+            setRegistrationError(true);
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -92,6 +107,7 @@ function CreationUserModal({ open, handleClose }) {
         setIsAdmin(false);
         setPasswordError(false);
         setPasswordErrorMessage('');
+        setRegistrationError(false);
     };
 
     const handleCloseDialog = () => {
@@ -205,6 +221,7 @@ function CreationUserModal({ open, handleClose }) {
                                     required
                                     fullWidth
                                     error={passwordError}
+                                    helperText={passwordError ? passwordErrorMessage : ''}
                                     value={rePassword}
                                     onChange={(e) => setRePassword(e.target.value)}
                                     sx={{ backgroundColor: 'white' }}
@@ -243,6 +260,18 @@ function CreationUserModal({ open, handleClose }) {
                             />
                         </FormControl>
 
+                        <Collapse in={registrationError}>
+                            <Alert
+                                severity="error"
+                                variant="outlined"
+                                onClose={() => setRegistrationError(false)}
+                                sx={{ mt: 1, borderRadius: 1.5 }}
+                            >
+                                <AlertTitle sx={{ fontWeight: 'bold' }}>Errore</AlertTitle>
+                                {"L'utente esiste o la registrazione non è andata a buon fine."}
+                            </Alert>
+                        </Collapse>
+
                     </Stack>
                 </DialogContent>
 
@@ -250,7 +279,8 @@ function CreationUserModal({ open, handleClose }) {
                     <StyledButton label='Chiudi' main={false} onClick={handleCloseDialog} />
                     <StyledButton
                         type="submit"
-                        label='Crea utente'
+                        label={isSubmitting ? 'Creazione...' : 'Crea utente'}
+                        disabled={isSubmitting}
                         sx={{ backgroundColor: 'black' }}
                     />
                 </DialogActions>
