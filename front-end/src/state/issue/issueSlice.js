@@ -50,8 +50,8 @@ const issueSlice = createSlice({
                 state.issue = state.issue.map(item => {
                     if (item.id_issue === action.payload.id_issue) {
                         return {
-                            ...action.payload, // Dati nuovi dal server (es. nuovo stato, updated_at)
-                            commenti: item.commenti // Mantieni i vecchi commenti che erano già in memoria!
+                            ...action.payload,
+                            commenti: item.commenti
                         };
                     }
                     return item;

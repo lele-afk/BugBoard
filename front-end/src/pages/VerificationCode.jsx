@@ -1,50 +1,72 @@
-import React, { useState } from 'react'
-import CardForm from '../component/CardForm'
+import React, { useState } from 'react';
+import CardForm from '../component/CardForm';
 import { useNavigate } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux'
-import { userRegistration } from '../state/user/userActions'
+import { useDispatch, useSelector } from 'react-redux';
+import { userRegistration } from '../state/user/userActions';
 import DomicileBanner from '../component/DomicileBanner';
+
 const VerificationCode = () => {
     const navigate = useNavigate();
-    const user = useSelector((state) => state.userState)
     const dispatch = useDispatch();
-    const [err, setErr] = useState(false)
 
-    const handleVerificationCodeSubmit = async (verificationCode) => {
-        if (user.verificationCode === verificationCode) {
+    // Recuperiamo l'intero stato dell'utente per non perdere nulla
+    const user = useSelector((state) => state.userState);
+    const [err, setErr] = useState(false);
+
+    // CardForm restituisce un oggetto strutturato come { verificationCode: "valore" }
+    const handleVerificationCodeSubmit = async (formData) => {
+        const inputCode = formData.verificationCode;
+        console.log('formData :>> ', formData);
+        console.log('user :>> ', user);
+        // Controllo di sicurezza: verifichiamo che il codice inserito coincida con quello in Redux
+        if (String(user.codeVerification) === String(inputCode)) {
             try {
-                setErr(false)
-                await dispatch(userRegistration({ email: user.email, password: user.password, role: 'user' })).unwrap();
-                navigate("/")
+                setErr(false);
+                // Inviamo al database il pacchetto dati COMPLETO
+                await dispatch(userRegistration({
+                    nome: user.nome,
+                    cognome: user.cognome,
+                    email: user.email,
+                    password: user.password,
+                    role: 'user'
+                })).unwrap();
+
+                navigate("/");
             } catch (error) {
-                setErr(true)
+                console.log('error :>> ', error);
+                setErr(true);
             }
+        } else {
+            // Codice OTP errato inserito dall'utente
+            setErr(true);
         }
-    }
+    };
 
     const handleBack = () => {
-        navigate("/registration")
-    }
+        navigate("/registration");
+    };
 
     return (
-
         <>
-            <CardForm onlyVerificationCode={true}
+            <CardForm
+                onlyVerificationCode={true}
                 withBackButton={true}
                 textOfTitle={'Pagina verifica codice'}
                 textOfSubtitle={'Inserisci codice'}
-                textOfDescription={'Inserisci il codice inviato via mail per confemare la registrazione'}
+                textOfDescription={'Inserisci il codice inviato via mail per confermare la registrazione'}
                 textOfButtonOfSubmit={'Completa registrazione'}
                 onBack={handleBack}
-                onSubmit={handleVerificationCodeSubmit} />
+                onSubmit={handleVerificationCodeSubmit}
+            />
             <DomicileBanner
-                severity={'err'}
+                severity={'error'} // Di solito MUI/DomicileBanner usa 'error', non 'err'
                 open={err}
                 handleClose={() => setErr(false)}
                 title={'Errore'}
-                message={'Registrazione fallita'}
-            /></>
-    )
-}
+                message={'Codice errato o registrazione fallita'}
+            />
+        </>
+    );
+};
 
-export default VerificationCode
+export default VerificationCode;

@@ -20,11 +20,12 @@ export const userLogin = createAsyncThunk("loginUser", async (req, { rejectWithV
 
 export const userRegistration = createAsyncThunk("registrationUser", async (req, { rejectWithValue }) => {
     try {
-        await registrationUser(req)
+        const response = await registrationUser(req);
+        return response.data;
     } catch (error) {
-        return rejectWithValue(error)
+        return rejectWithValue(error);
     }
-})
+});
 
 
 export const commentoInsert = createAsyncThunk("commentoInsert", async (req, { rejectWithValue }) => {
@@ -37,14 +38,15 @@ export const commentoInsert = createAsyncThunk("commentoInsert", async (req, { r
 
 export const sendMail = createAsyncThunk("sendMail", async (req, { rejectWithValue }) => {
     try {
-        const response = await sendMailApi(req)
+        const response = await sendMailApi(req);
         return {
+            nome: req.nome,          // <-- Recuperiamo il nome
+            cognome: req.cognome,    // <-- Recuperiamo il cognome
             email: req.email,
             password: req.password,
-            codeVerification: response.data.codeVerification
+            verificationCode: response.data.codeVerification // Allineato con la risposta del backend
         };
     } catch (error) {
-        return rejectWithValue(error)
+        return rejectWithValue(error);
     }
-
-})
+});

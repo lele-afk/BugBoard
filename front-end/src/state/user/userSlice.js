@@ -45,11 +45,23 @@ const userSlice = createSlice({
             state.nome = action.payload.nome
             state.cognome = action.payload.cognome
             state.password = action.payload.password
-            state.codeVerification = action.payload.codeVerification
+            state.codeVerification = action.payload.verificationCode
         })
         builder.addCase(userRegistration.fulfilled, (state, action) => {
-            state.registrationSuccess = true
-        })
+            // 1. Impostiamo il flag di successo a true
+            state.registrationSuccess = true;
+
+            // 2. Svuotiamo i dati temporanei di registrazione (consigliato per sicurezza)
+            state.nome = "";
+            state.cognome = "";
+            state.email = "";
+            state.password = "";
+            state.verificationCode = null;
+            state.loading = false;
+            state.error = null;
+
+            // NOTA: Nessun "return" qui sotto! Modificiamo il draft direttamente.
+        });
         builder.addCase(commentoInsert.fulfilled, (state, action) => {
             state.commentoLoaded = true
         })

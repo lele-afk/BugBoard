@@ -9,7 +9,7 @@ import DomicileBanner from "../component/DomicileBanner";
 import { resetRegistrationFlag } from "../state/user/userSlice";
 
 const LoginPage = () => {
-    const { registrationSucces } = useSelector(state => state.userState)
+    const { registrationSuccess } = useSelector(state => state.userState)
     const navigate = useNavigate()
     const dispatch = useDispatch();
     const [err, setErr] = useState(false)
@@ -98,8 +98,8 @@ const LoginPage = () => {
             message={'Login fallito, utente non esistente o le credenziali non sono corrette'}
         />
         <DomicileBanner
-            severity={'Success'}
-            open={registrationSucces}
+            severity={'success'}
+            open={registrationSuccess}
             handleClose={() => dispatch(resetRegistrationFlag())}
             title={'Conferma registrazione'}
             message={'Registrazione completata con successo'}
