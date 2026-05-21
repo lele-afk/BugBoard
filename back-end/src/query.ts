@@ -112,7 +112,11 @@ export async function getIssueWithSameId(filter: Filter) {
         const issues = await database.query.issue.findFirst({
             with: {
                 utente: true,
-                commenti: true,
+                commenti: {
+                    with: {
+                        utente: true // <--- Questo mancava nell'endpoint di inserimento!
+                    }
+                },
             },
             where: filter.id ? eq(issue.id_issue, filter.id) : undefined
         })
@@ -127,7 +131,11 @@ export async function getIssue() {
         const issues = await database.query.issue.findMany({
             with: {
                 utente: true,
-                commenti: true,
+                commenti: {
+                    with: {
+                        utente: true
+                    }
+                },
             },
         })
         return issues;
@@ -159,6 +167,7 @@ export async function insertIssue(newIssue: any): Promise<InsertIssue | undefine
         throw { code: 400, message: error };
     }
 }
+
 
 export async function insertCommento(newCommento: InsertCommenti): Promise<InsertIssue | undefined> {
     try {

@@ -28,7 +28,13 @@ export const insertIssue = async (newIssue) => {
 
 export const insertCommento = async (newCommento) => {
     try {
-        const response = await _post('/commento/insert', newCommento)
+        const token = localStorage.getItem("AuthToken");
+
+        const response = await _post('/commento/insert', newCommento, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        })
         return response
     } catch (error) {
         const message = error?.response?.data || "Errore imprevisto";

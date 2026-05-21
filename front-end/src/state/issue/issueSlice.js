@@ -5,7 +5,7 @@ const initialState = {
     issue: [],
     selectedissue: null,
     issueFiltered: null,
-    issueLoaded: false
+    issueLoaded: false,
 }
 
 const issueSlice = createSlice({
@@ -48,7 +48,13 @@ const issueSlice = createSlice({
             state.loadingIssue = false;
         })
         builder.addCase(commentoInsert.fulfilled, (state, action) => {
-            state.selectedIssue = action.payload
+            state.selectedIssue = action.payload;
+
+            if (state.issue) {
+                state.issue = state.issue.map(item =>
+                    item.id_issue === action.payload.id_issue ? action.payload : item
+                );
+            }
         })
     }
 })

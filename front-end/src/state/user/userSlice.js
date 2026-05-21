@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { sendMail, userLogin, userRegistration } from "./userActions";
+import { sendMail, userLogin, userRegistration, commentoInsert } from "./userActions";
 
 const initialState = {
     idUtente: null,
@@ -10,7 +10,8 @@ const initialState = {
     codeVerification: '',
     isAdmin: '',
     logged: false,
-    registrationSuccess: false
+    registrationSuccess: false,
+    commentoLoaded: false
 }
 const userSlice = createSlice({
     name: "utente",
@@ -22,7 +23,10 @@ const userSlice = createSlice({
         },
         resetRegistrationFlag: (state, action) => {
             state.registrationSuccess = false
+        }, resetCommentoLoaded: (state, action) => {
+            state.commentoLoaded = false
         }
+
     },
     extraReducers: (builder) => {
         builder.addCase(userLogin.fulfilled, (state, action) => {
@@ -46,8 +50,11 @@ const userSlice = createSlice({
         builder.addCase(userRegistration.fulfilled, (state, action) => {
             state.registrationSuccess = true
         })
+        builder.addCase(commentoInsert.fulfilled, (state, action) => {
+            state.commentoLoaded = true
+        })
 
     }
 })
-export const { resetState, resetRegistrationFlag } = userSlice.actions
+export const { resetState, resetRegistrationFlag, resetCommentoLoaded } = userSlice.actions
 export default userSlice

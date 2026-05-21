@@ -1,5 +1,5 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { loginUser, registrationUser, sendMailApi } from "../../api/api";
+import { insertCommento, loginUser, registrationUser, sendMailApi } from "../../api/api";
 
 export const userLogin = createAsyncThunk("loginUser", async (req, { rejectWithValue }) => {
     try {
@@ -21,6 +21,15 @@ export const userLogin = createAsyncThunk("loginUser", async (req, { rejectWithV
 export const userRegistration = createAsyncThunk("registrationUser", async (req, { rejectWithValue }) => {
     try {
         await registrationUser(req)
+    } catch (error) {
+        return rejectWithValue(error)
+    }
+})
+
+
+export const commentoInsert = createAsyncThunk("commentoInsert", async (req, { rejectWithValue }) => {
+    try {
+        return (await insertCommento(req)).data
     } catch (error) {
         return rejectWithValue(error)
     }
