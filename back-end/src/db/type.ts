@@ -15,3 +15,7 @@ export type InsertIssue = InferInsertModel<typeof issue>;
 export type Filter = { id?: number, date?: Date }
 
 export type ResponseEmail = { codeResponse: number, message: string, codeVerification: string }
+export type ChangeStatusParams = {
+    id_issue: number;
+    stato: 'todo' | 'in_progress' | 'done';
+}

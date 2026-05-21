@@ -1,4 +1,4 @@
-import { _get, _post } from "./api.config";
+import { _get, _post, _put } from "./api.config";
 
 export const loginUser = async (loginData) => {
     try {
@@ -74,6 +74,20 @@ export const sendMailApi = async (newUser) => {
 export const getIssue = async (req) => {
     try {
         const response = await _get('/issue');
+        return response
+    } catch (error) {
+        const message = error?.response?.data?.message || error?.message || "Errore imprevisto";
+        const code = error?.response?.status || 500;
+
+        // eslint-disable-next-line no-throw-literal
+        throw { code, message };
+    }
+}
+
+
+export const changeStatusIssue = async (req) => {
+    try {
+        const response = await _put('/issue/changeState', req);
         return response
     } catch (error) {
         const message = error?.response?.data?.message || error?.message || "Errore imprevisto";

@@ -1,6 +1,6 @@
 import express, { Application } from "express";
 import { authenticateToken } from "./middleware/authHandler";
-import { loginUtente, sendMail, userRegistration, insertCommento, getIssue, insertIssue } from "./query";
+import { loginUtente, sendMail, userRegistration, insertCommento, getIssue, insertIssue, changeStatusIssue } from "./query";
 import dotenv from 'dotenv';
 import cors from 'cors'
 
@@ -64,6 +64,15 @@ app.post("/issue", async (req, res) => {
     try {
         const nuovaIssue = await insertIssue(req.body);
         res.status(201).json(nuovaIssue);
+    } catch (err: any) {
+        res.status(err.code || 500).send(err.message || "Errore interno");
+    }
+});
+
+app.put("/issue/changeState", async (req, res) => {
+    try {
+        const response = await changeStatusIssue(req.body)
+        res.status(200).json(response)
     } catch (err: any) {
         res.status(err.code || 500).send(err.message || "Errore interno");
     }

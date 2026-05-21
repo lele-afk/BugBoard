@@ -46,6 +46,10 @@ const _post = (url, data = {}, config = {}) => {
     return apiClient.post(url, data, config);
 };
 
+const _put = (url, data = {}, config = {}) => {
+    return apiClient.put(url, data, config);
+};
 
 
-export { _get, _post };
+
+export { _get, _post, _put };

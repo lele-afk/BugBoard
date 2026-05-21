@@ -1,5 +1,5 @@
 import { createSlice, } from "@reduxjs/toolkit";
-import { commentoInsert, getIssues, issueInsert } from "./issueAction";
+import { commentoInsert, getIssues, issueChangeStatus, issueInsert } from "./issueAction";
 
 const initialState = {
     issue: [],
@@ -45,6 +45,19 @@ const issueSlice = createSlice({
         builder.addCase(issueInsert.rejected, (state) => {
             state.loadingIssue = false;
         })
+        builder.addCase(issueChangeStatus.fulfilled, (state, action) => {
+            if (state.issue) {
+                state.issue = state.issue.map(item => {
+                    if (item.id_issue === action.payload.id_issue) {
+                        return {
+                            ...action.payload, // Dati nuovi dal server (es. nuovo stato, updated_at)
+                            commenti: item.commenti // Mantieni i vecchi commenti che erano già in memoria!
+                        };
+                    }
+                    return item;
+                });
+            }
+        });
         builder.addCase(commentoInsert.fulfilled, (state, action) => {
             state.selectedIssue = action.payload;
 

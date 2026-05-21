@@ -1,5 +1,5 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { getIssue, insertIssue, insertCommento } from "../../api/api";
+import { getIssue, insertIssue, insertCommento, changeStatusIssue } from "../../api/api";
 
 
 export const getIssues = createAsyncThunk("getIssue", async (req, { rejectWithValue }) => {
@@ -14,6 +14,15 @@ export const getIssues = createAsyncThunk("getIssue", async (req, { rejectWithVa
 export const issueInsert = createAsyncThunk("issueInsert", async (req, { rejectWithValue }) => {
     try {
         const response = await insertIssue(req)
+        return response.data
+    } catch (error) {
+        return rejectWithValue(error)
+    }
+})
+
+export const issueChangeStatus = createAsyncThunk("issueChangeStatus", async (req, { rejectWithValue }) => {
+    try {
+        const response = await changeStatusIssue(req)
         return response.data
     } catch (error) {
         return rejectWithValue(error)

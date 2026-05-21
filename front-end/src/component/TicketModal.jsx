@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { resetCommentoLoaded } from '../state/user/userSlice';
 import StyledButton from './StyledButton';
 import { commentoInsert } from '../state/user/userActions';
+import { issueChangeStatus } from '../state/issue/issueAction';
 
 const style = {
     position: 'absolute',
@@ -40,10 +41,10 @@ const TicketModal = ({ open, handleClose, ticket: initialTicket }) => {
     const [currentStatus, setCurrentStatus] = useState(ticket?.stato || 'todo');
     const [newComment, setNewComment] = useState("");
 
-    // Sincronizza lo stato locale dello status quando cambia il ticket di Redux
     useEffect(() => {
         if (ticket) {
-            setCurrentStatus(ticket.stato);
+            // Normalizziamo 'in_progress' proveniente dal DB per la stringa locale 'inprogress'
+            setCurrentStatus(ticket.stato === 'in_progress' ? 'inprogress' : ticket.stato);
         }
     }, [ticket]);
 
@@ -62,8 +63,16 @@ const TicketModal = ({ open, handleClose, ticket: initialTicket }) => {
     const handleStatusChange = () => {
         const nextStatus = NEXT_STATUS_MAP[currentStatus];
         if (nextStatus) {
-            setCurrentStatus(nextStatus);
-            console.log(`Stato aggiornato nel database a: ${nextStatus}`);
+            // Se lo stato successivo è 'inprogress', lo mappiamo come 'in_progress' per rispettare Drizzle
+            const backendStatus = nextStatus === 'inprogress' ? 'in_progress' : nextStatus;
+
+            const payload = {
+                id_issue: ticket.id_issue,
+                stato: backendStatus
+            };
+
+            // Eseguiamo il dispatch verso l'azione asincrona di Redux
+            dispatch(issueChangeStatus(payload));
         }
     };
 

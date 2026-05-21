@@ -1,7 +1,7 @@
 import { database } from "./server";
 import { commento, issue, utente } from "./db/schemas";
 import { and, arrayOverlaps, asc, count, desc, eq, gte, isNull, lte, sql } from "drizzle-orm";
-import { InsertCommenti, InsertIssue, InsertUtenti, RegistrationUser, SelectUtenti, UserLogged, ResponseEmail, Filter, Role } from "./db/type";
+import { InsertCommenti, InsertIssue, InsertUtenti, RegistrationUser, SelectUtenti, UserLogged, ResponseEmail, Filter, Role, ChangeStatusParams } from "./db/type";
 import * as bcrypt from "bcryptjs"
 import * as jwt from 'jsonwebtoken'
 import * as nodemailer from 'nodemailer'
@@ -15,6 +15,50 @@ async function checkUser(filters: { email: string; }) {
         return user
     } catch (error) {
         throw { code: 500, message: error }
+    }
+}
+// Definiamo il tipo per i parametri in ingresso basandoci sugli enum di Drizzle
+
+export async function changeStatusIssue(params: ChangeStatusParams) {
+    const { id_issue, stato } = params;
+
+    // 1. Validazione dei dati in ingresso
+    if (!id_issue) {
+        throw { code: 400, message: "ID del ticket mancante" };
+    }
+
+    const validStati = ["todo", "in_progress", "done"];
+    if (!stato || !validStati.includes(stato)) {
+        throw { code: 400, message: `Stato non valido. Valori ammessi: ${validStati.join(', ')}` };
+    }
+
+    try {
+        // 2. Esegui l'aggiornamento con Drizzle
+        // Usiamo .returning() per farci restituire la riga aggiornata dal database
+        const updatedIssues = await database
+            .update(issue)
+            .set({
+                stato: stato,
+                updated_at: new Date() // Aggiorniamo anche il timestamp di modifica
+            })
+            .where(eq(issue.id_issue, id_issue))
+            .returning();
+
+        // 3. Se l'array è vuoto, significa che il ticket con quell'ID non esiste
+        if (updatedIssues.length === 0) {
+            throw { code: 404, message: `Nessun ticket trovato con ID ${id_issue}` };
+        }
+
+        // Restituiamo la issue aggiornata (il controller la invierà come JSON al frontend)
+        return updatedIssues[0];
+
+    } catch (error: any) {
+
+        // Se è un errore sollevato da noi (400 o 404), lo rilanciamo così com'è
+        if (error.code) throw error;
+
+        // Altrimenti, lo trattiamo come errore interno del database (500)
+        throw { code: 500, message: "Impossibile aggiornare il ticket sul database" };
     }
 }
 
