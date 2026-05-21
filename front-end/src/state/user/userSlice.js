@@ -11,7 +11,8 @@ const initialState = {
     isAdmin: '',
     logged: false,
     registrationSuccess: false,
-    commentoLoaded: false
+    commentoLoaded: false,
+    mailSended: false
 }
 const userSlice = createSlice({
     name: "utente",
@@ -23,8 +24,12 @@ const userSlice = createSlice({
         },
         resetRegistrationFlag: (state, action) => {
             state.registrationSuccess = false
-        }, resetCommentoLoaded: (state, action) => {
+        },
+        resetCommentoLoaded: (state, action) => {
             state.commentoLoaded = false
+        },
+        resetMailSended: (state, action) => {
+            state.mailSended = false
         }
 
     },
@@ -46,6 +51,7 @@ const userSlice = createSlice({
             state.cognome = action.payload.cognome
             state.password = action.payload.password
             state.codeVerification = action.payload.verificationCode
+            state.mailSended = true
         })
         builder.addCase(userRegistration.fulfilled, (state, action) => {
             // 1. Impostiamo il flag di successo a true
@@ -68,5 +74,5 @@ const userSlice = createSlice({
 
     }
 })
-export const { resetState, resetRegistrationFlag, resetCommentoLoaded } = userSlice.actions
+export const { resetState, resetRegistrationFlag, resetCommentoLoaded, resetMailSended } = userSlice.actions
 export default userSlice

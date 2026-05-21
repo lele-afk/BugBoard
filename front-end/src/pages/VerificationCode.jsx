@@ -3,6 +3,7 @@ import CardForm from '../component/CardForm';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { userRegistration } from '../state/user/userActions';
+import { resetMailSended } from '../state/user/userSlice';
 import DomicileBanner from '../component/DomicileBanner';
 
 const VerificationCode = () => {
@@ -59,11 +60,18 @@ const VerificationCode = () => {
                 onSubmit={handleVerificationCodeSubmit}
             />
             <DomicileBanner
-                severity={'error'} // Di solito MUI/DomicileBanner usa 'error', non 'err'
+                severity={'error'}
                 open={err}
                 handleClose={() => setErr(false)}
                 title={'Errore'}
                 message={'Codice errato o registrazione fallita'}
+            />
+            <DomicileBanner
+                severity={'success'}
+                open={user.mailSended}
+                handleClose={() => dispatch(resetMailSended())}
+                title={'Successo'}
+                message={'É stata inviata un mail con il codice di verifica identitá alla mail inserita durnte la registrazione'}
             />
         </>
     );
