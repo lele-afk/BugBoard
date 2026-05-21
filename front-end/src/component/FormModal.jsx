@@ -63,14 +63,6 @@ const FormModal = ({ open, handleClose }) => {
     const handleSubmit = async (event) => {
         event.preventDefault();
 
-        // Validazione minima prima dell'invio
-        if (!titolo.trim() || !priority || !typo) {
-            // Se mancano i dati obbligatori blocchiamo l'invio
-            return;
-        }
-
-        console.log('user :>> ', user);
-
 
         const payload = {
             id_utente: user.idUtente,        // <-- FONDAMENTALE: Evita l'errore NOT NULL del DB
@@ -198,7 +190,7 @@ const FormModal = ({ open, handleClose }) => {
                     <StyledButton type="button" label='Chiudi' main={false} onClick={handleCloseDialog} />
                     <StyledButton
                         type="submit"
-                        disabled={!(user?.idUtente || user?.id_utente || user?.data?.id)}
+                        disabled={!(user?.idUtente || user?.id_utente || user?.data?.id) || !titolo.trim() || !priority || !typo}
                         label={!(user?.idUtente || user?.id_utente || user?.data?.id) ? 'Caricamento utente...' : 'Crea ticket'}
                         sx={{ backgroundColor: 'black', color: 'white' }}
                     />
