@@ -222,7 +222,7 @@ const Dashboard = () => {
                             }}>
                                 {issue && issue.filter(t => t.stato === status).map((ticket) => (
                                     <Card
-                                        key={ticket.id}
+                                        key={ticket.id_issue} // Cambiato da ticket.id a ticket.id_issue
                                         sx={{
                                             mb: 1,
                                             borderRadius: 2,
@@ -233,12 +233,54 @@ const Dashboard = () => {
                                     >
                                         <CardActionArea onClick={() => handleOpenModal(ticket)}>
                                             <CardContent sx={{ p: 1.5, "&:last-child": { pb: 1.5 } }}>
-                                                <Typography variant="body2" sx={{ fontSize: '0.9rem', color: '#172b4d' }}>
+
+                                                {/* Titolo Principale della Issue */}
+                                                <Typography
+                                                    variant="body2"
+                                                    sx={{
+                                                        fontSize: '1rem',
+                                                        fontWeight: 'bold', // Rende il titolo ben visibile
+                                                        color: '#172b4d',
+                                                        mb: 1.5 // Spazio prima dei dettagli inferiori
+                                                    }}
+                                                >
                                                     {ticket.titolo}
                                                 </Typography>
-                                                <Typography variant="caption" sx={{ color: '#5e6c84', mt: 1, display: 'block' }}>
-                                                    #{ticket.id}
-                                                </Typography>
+
+                                                {/* Footer della Card: ID e Tipologia in linea */}
+                                                <Box
+                                                    display="flex"
+                                                    justifyContent="space-between"
+                                                    alignItems="center"
+                                                >
+                                                    {/* ID della Issue */}
+                                                    <Typography
+                                                        variant="caption"
+                                                        sx={{
+                                                            color: '#5e6c84',
+                                                            fontWeight: 'bold' // ID in risalto
+                                                        }}
+                                                    >
+                                                        #{ticket.id_issue}
+                                                    </Typography>
+
+                                                    {/* Tipologia di Issue (es. FEATURE, BUG, ecc.) */}
+                                                    <Typography
+                                                        variant="caption"
+                                                        sx={{
+                                                            color: '#0052cc', // Colore blu per differenziarlo dall'ID
+                                                            fontWeight: 'bold',
+                                                            textTransform: 'uppercase', // Lo renderizza in maiuscolo
+                                                            backgroundColor: '#deebff', // Un leggero sfondo colorato tipo badge
+                                                            px: 1,
+                                                            py: 0.2,
+                                                            borderRadius: 1
+                                                        }}
+                                                    >
+                                                        {ticket.tipo}
+                                                    </Typography>
+                                                </Box>
+
                                             </CardContent>
                                         </CardActionArea>
                                     </Card>
