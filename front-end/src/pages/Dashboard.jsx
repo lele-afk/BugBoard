@@ -37,6 +37,8 @@ const Dashboard = () => {
     const [isModalOpenOfCreationTicket, setIsModalOpenOfCreationTicket] = useState(false);
     const [isModalCreationOpen, setIsModalCreationOpen] = useState(false);
     const [err, setErr] = useState(false)
+    const [createIssueErr, setCreateIssueErr] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
     const [utente, setUtente] = useState('');
     const [priorita, setPriorita] = useState('');
     const theme = useTheme();
@@ -44,6 +46,7 @@ const Dashboard = () => {
     const navigate = useNavigate()
     const dispatch = useDispatch();
     const { issue, issueLoaded } = useSelector((state) => state.issueState)
+    const user = useSelector((state) => state.userState)
 
     const fetchIssue = async () => {
         try {
@@ -86,6 +89,11 @@ const Dashboard = () => {
     const handleCloseCreationModal = () => {
         setIsModalCreationOpen(false)
     }
+
+    const handleCreateIssueError = (msg) => {
+        setErrorMessage(msg || 'Errore durante l\'inserimento della issue');
+        setCreateIssueErr(true);
+    };
 
     const getTicketCount = (status) => issue && issue.filter(t => t.stato === status).length;
 
@@ -160,7 +168,7 @@ const Dashboard = () => {
                                 endIcon={<AddIcon />}
                                 onClick={handleOpenCreateTicket}
                             ></StyledButton>
-                            {true && <StyledButton
+                            {user.isAdmin && <StyledButton
                                 label={"Crea utente"}
                                 main={true}
                                 endIcon={<AddIcon />}
@@ -222,7 +230,7 @@ const Dashboard = () => {
                             }}>
                                 {issue && issue.filter(t => t.stato === status).map((ticket) => (
                                     <Card
-                                        key={ticket.id_issue} // Cambiato da ticket.id a ticket.id_issue
+                                        key={ticket.id_issue}
                                         sx={{
                                             mb: 1,
                                             borderRadius: 2,
@@ -234,44 +242,40 @@ const Dashboard = () => {
                                         <CardActionArea onClick={() => handleOpenModal(ticket)}>
                                             <CardContent sx={{ p: 1.5, "&:last-child": { pb: 1.5 } }}>
 
-                                                {/* Titolo Principale della Issue */}
                                                 <Typography
                                                     variant="body2"
                                                     sx={{
                                                         fontSize: '1rem',
-                                                        fontWeight: 'bold', // Rende il titolo ben visibile
+                                                        fontWeight: 'bold',
                                                         color: '#172b4d',
-                                                        mb: 1.5 // Spazio prima dei dettagli inferiori
+                                                        mb: 1.5
                                                     }}
                                                 >
                                                     {ticket.titolo}
                                                 </Typography>
 
-                                                {/* Footer della Card: ID e Tipologia in linea */}
                                                 <Box
                                                     display="flex"
                                                     justifyContent="space-between"
                                                     alignItems="center"
                                                 >
-                                                    {/* ID della Issue */}
                                                     <Typography
                                                         variant="caption"
                                                         sx={{
                                                             color: '#5e6c84',
-                                                            fontWeight: 'bold' // ID in risalto
+                                                            fontWeight: 'bold'
                                                         }}
                                                     >
                                                         #{ticket.id_issue}
                                                     </Typography>
 
-                                                    {/* Tipologia di Issue (es. FEATURE, BUG, ecc.) */}
                                                     <Typography
                                                         variant="caption"
                                                         sx={{
-                                                            color: '#0052cc', // Colore blu per differenziarlo dall'ID
+                                                            color: '#0052cc',
                                                             fontWeight: 'bold',
-                                                            textTransform: 'uppercase', // Lo renderizza in maiuscolo
-                                                            backgroundColor: '#deebff', // Un leggero sfondo colorato tipo badge
+                                                            textTransform: 'uppercase',
+                                                            backgroundColor: '#deebff',
                                                             px: 1,
                                                             py: 0.2,
                                                             borderRadius: 1
@@ -292,7 +296,7 @@ const Dashboard = () => {
             </Box>
 
             <TicketModal open={isModalOpen} handleClose={handleCloseModal} ticket={selectedTicket} />
-            <FormModal open={isModalOpenOfCreationTicket} handleClose={handleCloseCreateTicket}></FormModal>
+            <FormModal open={isModalOpenOfCreationTicket} handleClose={handleCloseCreateTicket} onError={handleCreateIssueError}></FormModal>
             <CreationUserModal open={isModalCreationOpen} handleClose={handleCloseCreationModal}></CreationUserModal>
             <DomicileBanner
                 severity={'error'}
@@ -300,6 +304,13 @@ const Dashboard = () => {
                 title={'Errore'}
                 handleClose={() => setErr(false)}
                 message={'Recupero dati issue fallito'}
+            />
+            <DomicileBanner
+                severity={'error'}
+                open={createIssueErr}
+                title={'Errore Creazione'}
+                handleClose={() => setCreateIssueErr(false)}
+                message={errorMessage}
             />
             <DomicileBanner
                 severity={'success'}

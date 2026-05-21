@@ -62,12 +62,7 @@ app.post("/user/sendMail", async (req, res) => {
 
 app.post("/issue", async (req, res) => {
     try {
-        // Recupera l'id utente (dal token o, se lo passi temporaneamente per test, dal body/query)
-        // Ad esempio, se lo passi nel body: req.body.id_utente
-
         const nuovaIssue = await insertIssue(req.body);
-
-        // Restituiamo la issue creata con status 201 (Created)
         res.status(201).json(nuovaIssue);
     } catch (err: any) {
         res.status(err.code || 500).send(err.message || "Errore interno");

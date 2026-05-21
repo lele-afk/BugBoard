@@ -2,9 +2,6 @@ import React from 'react'
 import { AppBar, Box, Toolbar, Typography } from '@mui/material';
 
 const Header = () => {
-    //  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-    // const navigate = useNavigate()
-
     return (
         <AppBar position="static"
             sx={{

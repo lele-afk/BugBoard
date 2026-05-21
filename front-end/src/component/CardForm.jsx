@@ -27,7 +27,6 @@ const CardForm = ({
     const [passwordError, setPasswordError] = useState(false);
     const [passwordErrorMessage, setPasswordErrorMessage] = useState('');
 
-    // Stati per gestire i valori dei campi di testo
     const [nome, setNome] = useState('');
     const [cognome, setCognome] = useState('');
     const [email, setEmail] = useState('');
@@ -48,7 +47,6 @@ const CardForm = ({
 
     const validateInputs = () => {
         let isValid = true;
-        // Adesso il controllo avviene direttamente sulle stringhe salvate nello stato
         if (password.length < 6) {
             setPasswordError(true);
             setPasswordErrorMessage('La password dovrebbe essere lunga almeno 6 caratteri.');
@@ -66,9 +64,7 @@ const CardForm = ({
 
     const handleSubmit = (event) => {
         event.preventDefault();
-        console.log('password, rePassword :>> ', password, rePassword);
 
-        // Se mostriamo solo il codice di verifica saltiamo il controllo delle password
         if (!onlyVerificationCode && !validateInputs()) {
             return;
         }
@@ -79,7 +75,6 @@ const CardForm = ({
             if (onlyVerificationCode) {
                 onSubmit({ verificationCode });
             } else if (withPrivateData) {
-                // Se ci sono dati privati, passiamo anche nome e cognome alla callback
                 onSubmit({ nome, cognome, email, password });
             } else {
                 onSubmit({ email, password });

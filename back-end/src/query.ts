@@ -114,7 +114,7 @@ export async function getIssueWithSameId(filter: Filter) {
                 utente: true,
                 commenti: {
                     with: {
-                        utente: true // <--- Questo mancava nell'endpoint di inserimento!
+                        utente: true
                     }
                 },
             },
@@ -140,30 +140,24 @@ export async function getIssue() {
         })
         return issues;
     } catch (error) {
-        console.log('error :>> ', error);
         throw { code: 500, message: "Errore recupero dati." }
     }
 }
 
 export async function insertIssue(newIssue: any): Promise<InsertIssue | undefined> {
     try {
-        // Mappatura di sicurezza: allineiamo i dati del req.body con lo schema del DB
         const dataToInsert = {
-            id_utente: newIssue.id_utente, // <-- Assicurati di passarlo dal FE (es. prendendolo dal JWT)
+            id_utente: newIssue.id_utente,
             titolo: newIssue.titolo,
             descrizione: newIssue.descrizione,
-            priorita: newIssue.priority,   // Se sul DB si chiama 'priorita' e dal FE arriva 'priority'
-            tipo: newIssue.tipo?.toLowerCase(), // Il DB si aspetta 'bug', dal FE arriva 'Bug' (maiuscolo)
-            immagine: newIssue.immagine_url, // Se sul DB si chiama 'immagine'
+            priorita: newIssue.priority,
+            tipo: newIssue.tipo?.toLowerCase(),
+            immagine: newIssue.immagine_url,
         };
 
-        // AGGIUNTO .returning(): Forza Postgres a restituire i dati inseriti
         const response = await database.insert(issue).values(dataToInsert).returning();
-
-        // Visto che response è un array (es: [insertedIssue]), restituiamo il primo elemento
         return response[0];
     } catch (error) {
-        console.error("Errore DB Insert:", error);
         throw { code: 400, message: error };
     }
 }

@@ -17,7 +17,7 @@ const VisuallyHiddenInput = styled('input')({
     width: 1,
 });
 
-const FormModal = ({ open, handleClose }) => {
+const FormModal = ({ open, handleClose, onError }) => {
     const theme = useTheme();
     const dispatch = useDispatch();
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
@@ -41,7 +41,7 @@ const FormModal = ({ open, handleClose }) => {
         setFileName(fileUploaded.name);
         const reader = new FileReader();
         reader.onloadend = () => {
-            setFile(reader.result); // Questo sarà il Base64 da mandare al backend
+            setFile(reader.result);
         };
         reader.readAsDataURL(fileUploaded);
     };
@@ -65,20 +65,23 @@ const FormModal = ({ open, handleClose }) => {
 
 
         const payload = {
-            id_utente: user.idUtente,        // <-- FONDAMENTALE: Evita l'errore NOT NULL del DB
+            id_utente: user.idUtente,
             titolo: titolo,
-            descrizione: descrizione || '',     // Sostituisce stringa vuota per sicurezza
-            priority: priority,                 // Mantiene 'low', 'medium', 'high'
-            tipo: typo.toLowerCase(),           // <-- FONDAMENTALE: Trasforma 'Bug' in 'bug' per l'enum del DB
-            immagine_url: file                  // Il Base64 o null
+            descrizione: descrizione || '',
+            priority: priority,
+            tipo: typo.toLowerCase(),
+            immagine_url: file
         };
 
         try {
-
             await dispatch(issueInsert(payload)).unwrap();
             handleCloseDialog();
         } catch (error) {
             console.error("Errore durante la creazione del ticket nel Form:", error);
+            handleCloseDialog();
+            if (onError) {
+                onError("Creazione del ticket fallita. Riprova.");
+            }
         }
     };
 

@@ -10,20 +10,12 @@ export const prioritaEnum = pgEnum('priorita_enum', ["low", "medium", "high"]);
 
 
 export const utente = pgTable('utente', {
-    // Se usi SERIAL nel DB, in Drizzle basta .primaryKey() senza generatedAlwaysAsIdentity
     id_utente: type.integer('id_utente').notNull().primaryKey(),
-
-    // Aggiornata la lunghezza a 100 come da DB
     nome: type.varchar('nome', { length: 100 }).notNull(),
     cognome: type.varchar('cognome', { length: 100 }).notNull(),
-
-    // Aggiornata la lunghezza a 255 come da DB
     email: type.varchar('email', { length: 255 }).notNull().unique(),
     password: type.varchar('password', { length: 255 }).notNull(),
-
     role: ruoloEnum('role').notNull().default("user"),
-
-    // CORREZIONE CHIAVE: Mappiamo la proprietà su 'created_at' (Postgres non fa caso a MAIUSCOLE/minuscole nei nomi virgolettati se scritti così)
     data_registrazione: type.timestamp('created_at').defaultNow().notNull()
 });
 

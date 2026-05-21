@@ -27,19 +27,16 @@ function CreationUserModal({ open, handleClose }) {
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
     const dispatch = useDispatch();
 
-    // Stati per i campi del form
     const [nome, setNome] = useState('');
     const [cognome, setCognome] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [rePassword, setRePassword] = useState('');
-    const [isAdmin, setIsAdmin] = useState(false); // Stato booleano per la checkbox
+    const [isAdmin, setIsAdmin] = useState(false);
 
-    // Stati per la visibilità delle password
     const [showPassword, setShowPassword] = useState(false);
     const [showRePassword, setShowRePassword] = useState(false);
 
-    // Stati per la gestione degli errori delle password
     const [passwordError, setPasswordError] = useState(false);
     const [passwordErrorMessage, setPasswordErrorMessage] = useState('');
 
@@ -75,7 +72,7 @@ function CreationUserModal({ open, handleClose }) {
             cognome,
             email,
             password,
-            role: isAdmin ? 'admin' : 'user' // Converte il booleano della checkbox nella stringa richiesta dal DB
+            role: isAdmin ? 'admin' : 'user'
         };
 
         try {
@@ -230,7 +227,6 @@ function CreationUserModal({ open, handleClose }) {
                             </FormControl>
                         </Stack>
 
-                        {/* Sezione Ruolo convertita in Checkbox coerente con la struttura della pagina */}
                         <FormControl fullWidth>
                             <FormLabel sx={{ fontWeight: 'bold', mb: 1 }}>Permessi account</FormLabel>
                             <FormControlLabel
@@ -239,7 +235,7 @@ function CreationUserModal({ open, handleClose }) {
                                         checked={isAdmin}
                                         onChange={(e) => setIsAdmin(e.target.checked)}
                                         color="primary"
-                                        sx={{ '& .MuiSvgIcon-root': { fontSize: 26 } }} // Leggera enfasi all'icona della checkbox
+                                        sx={{ '& .MuiSvgIcon-root': { fontSize: 26 } }}
                                     />
                                 }
                                 label="Registra questo utente come Amministratore (Admin)"

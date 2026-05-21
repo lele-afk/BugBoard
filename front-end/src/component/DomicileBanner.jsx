@@ -3,14 +3,12 @@ import { Alert, AlertTitle, Box, Snackbar } from "@mui/material";
 
 const DomicileBanner = ({ severity, open, handleClose, title = '', message = '' }) => {
 
-    // Rimosso il "if (!open) return null" per permettere l'animazione di chiusura di MUI
-
     const handleCloseWithClickaway = (event, reason) => {
         if (reason === 'clickaway') {
-            return; // Ignora il click fuori se l'utente clicca casualmente sullo schermo
+            return;
         }
         if (handleClose) {
-            handleClose(); // Esegue clearAlertForCreateIssue dispatchato dal padre
+            handleClose();
         }
     };
 
@@ -19,11 +17,10 @@ const DomicileBanner = ({ severity, open, handleClose, title = '', message = '' 
             <Snackbar
                 anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
                 open={open}
-                autoHideDuration={5000} // Si chiuderà da solo dopo 5 secondi
+                autoHideDuration={5000}
                 onClose={handleCloseWithClickaway}
                 key={'bottom-right'}
             >
-                {/* L'onClose sull'Alert mostra automaticamente la "X" a destra */}
                 <Alert
                     severity={severity}
                     variant="outlined"

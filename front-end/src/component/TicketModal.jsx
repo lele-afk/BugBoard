@@ -86,7 +86,6 @@ const TicketModal = ({ open, handleClose, ticket: initialTicket }) => {
     return (
         <Modal open={open} onClose={handleClose}>
             <Box sx={style}>
-                {/* Header: Info di testata */}
                 <Box display="flex" justifyContent="space-between" alignItems="center" sx={{ mb: 1 }}>
                     <Typography variant="overline" color="text.secondary">
                         ID TICKET: {ticket.id_issue} — Tipo: <Typography component="span" variant="overline" sx={{ fontWeight: 'bold' }}>{ticket.tipo}</Typography>
@@ -98,7 +97,6 @@ const TicketModal = ({ open, handleClose, ticket: initialTicket }) => {
                     />
                 </Box>
 
-                {/* ALERT INTEGRATO NELLA MODALE */}
                 <Collapse in={commentoLoaded}>
                     <Alert
                         severity="success"
@@ -115,7 +113,6 @@ const TicketModal = ({ open, handleClose, ticket: initialTicket }) => {
                     {ticket.titolo}
                 </Typography>
 
-                {/* Badge Priorità e Date */}
                 <Box display="flex" gap={1} mb={2} flexWrap="wrap">
                     <Chip label={`Priorità: ${ticket.priorita?.toUpperCase()}`} size="small" variant="outlined" />
                     <Typography variant="caption" color="text.secondary" sx={{ alignSelf: 'center' }}>
@@ -125,7 +122,6 @@ const TicketModal = ({ open, handleClose, ticket: initialTicket }) => {
 
                 <Divider sx={{ my: 2 }} />
 
-                {/* Descrizione */}
                 <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
                     Descrizione:
                 </Typography>
@@ -135,7 +131,6 @@ const TicketModal = ({ open, handleClose, ticket: initialTicket }) => {
 
                 <Divider sx={{ my: 2 }} />
 
-                {/* WORKFLOW: Cambio Stato */}
                 <Box sx={{ mb: 3, p: 2, bgcolor: 'action.hover', borderRadius: 1 }}>
                     <Typography variant="subtitle2" sx={{ mb: 1 }}>
                         Stato Attuale: <Typography component="span" variant="subtitle2" sx={{ fontWeight: 'bold' }}>{currentStatus.toUpperCase()}</Typography>
@@ -154,7 +149,6 @@ const TicketModal = ({ open, handleClose, ticket: initialTicket }) => {
 
                 <Divider sx={{ my: 2 }} />
 
-                {/* SEZIONE COMMENTI AGGIORNATA IN REAL-TIME */}
                 <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mb: 1 }}>
                     Commenti ({listaCommenti.length})
                 </Typography>
@@ -180,7 +174,6 @@ const TicketModal = ({ open, handleClose, ticket: initialTicket }) => {
                     )}
                 </Box>
 
-                {/* Input per nuovo commento */}
                 <Box display="flex" gap={1} alignItems="flex-start" sx={{ mb: 3 }}>
                     <TextField
                         fullWidth
@@ -194,7 +187,6 @@ const TicketModal = ({ open, handleClose, ticket: initialTicket }) => {
                     <StyledButton onClick={handleAddComment} label="Invia" />
                 </Box>
 
-                {/* Footer Modale */}
                 <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>
                     <StyledButton onClick={handleClose} main={false} label='Chiudi' />
                 </Box>

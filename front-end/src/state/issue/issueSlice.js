@@ -40,11 +40,9 @@ const issueSlice = createSlice({
             state.loadingIssue = false;
         })
         builder.addCase(issueInsert.pending, (state) => {
-            // Quando la chiamata parte, il loading va a true
             state.loadingIssue = true;
         })
         builder.addCase(issueInsert.rejected, (state) => {
-            // Se fallisce, spegniamo il loading
             state.loadingIssue = false;
         })
         builder.addCase(commentoInsert.fulfilled, (state, action) => {
