@@ -2,9 +2,10 @@ import { createSlice, } from "@reduxjs/toolkit";
 import { commentoInsert, getIssues, issueInsert } from "./issueAction";
 
 const initialState = {
-    issue: null,
+    issue: [],
     selectedissue: null,
-    issueFiltered: null
+    issueFiltered: null,
+    issueLoaded: false
 }
 
 const issueSlice = createSlice({
@@ -23,14 +24,20 @@ const issueSlice = createSlice({
         clearLoadingIssue: (state) => {
             state.loadingissue = false;
         },
+        clearAlertForCreateIssue: (state) => {
+            state.issueLoaded = false;
+        },
+
+
     },
     extraReducers: (builder) => {
         builder.addCase(getIssues.fulfilled, (state, action) => {
-            console.log('action.payload :>> ', action.payload);
             state.issue = action.payload
         });
         builder.addCase(issueInsert.fulfilled, (state, action) => {
+            state.issueLoaded = true
             state.issue = [...state.issue, action.payload];
+            state.loadingIssue = false;
         })
         builder.addCase(issueInsert.pending, (state) => {
             // Quando la chiamata parte, il loading va a true
@@ -46,5 +53,11 @@ const issueSlice = createSlice({
     }
 })
 
-export const { setSelectedissue, clearSelectedissue, setissueFiltered, clearLoadingissue } = issueSlice.actions;
+export const {
+    setSelectedIssue,
+    clearSelectedIssue,
+    setIssueFiltered,
+    clearLoadingIssue,
+    clearAlertForCreateIssue
+} = issueSlice.actions;
 export default issueSlice

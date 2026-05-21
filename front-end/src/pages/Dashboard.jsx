@@ -27,7 +27,7 @@ import { resetState } from '../state/user/userSlice';
 import CreationUserModal from '../component/CreationUserModal';
 import { getIssues } from '../state/issue/issueAction';
 import DomicileBanner from '../component/DomicileBanner';
-
+import { clearAlertForCreateIssue } from '../state/issue/issueSlice';
 
 const COLUMNS = ['todo', 'in_progress', 'done'];
 
@@ -43,7 +43,7 @@ const Dashboard = () => {
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
     const navigate = useNavigate()
     const dispatch = useDispatch();
-    const { issue } = useSelector((state) => state.issueState)
+    const { issue, issueLoaded } = useSelector((state) => state.issueState)
 
     const fetchIssue = async () => {
         try {
@@ -253,10 +253,17 @@ const Dashboard = () => {
             <FormModal open={isModalOpenOfCreationTicket} handleClose={handleCloseCreateTicket}></FormModal>
             <CreationUserModal open={isModalCreationOpen} handleClose={handleCloseCreationModal}></CreationUserModal>
             <DomicileBanner
-                severity={'Error'}
+                severity={'error'}
                 open={err}
                 title={'Errore'}
                 message={'Recupero dati issue fallito'}
+            />
+            <DomicileBanner
+                severity={'success'}
+                open={issueLoaded}
+                handleClose={() => dispatch(clearAlertForCreateIssue())}
+                title={'Successo'}
+                message={'Inserimento issue completato'}
             />
         </Box>
     );
