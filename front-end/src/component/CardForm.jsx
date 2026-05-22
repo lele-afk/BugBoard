@@ -24,8 +24,14 @@ const CardForm = ({
 
     const [showPassword, setShowPassword] = useState(false);
     const [showRePassword, setShowRePassword] = useState(false);
+
+    // Stati per la gestione degli errori
     const [passwordError, setPasswordError] = useState(false);
     const [passwordErrorMessage, setPasswordErrorMessage] = useState('');
+    const [nomeError, setNomeError] = useState(false);
+    const [nomeErrorMessage, setNomeErrorMessage] = useState('');
+    const [cognomeError, setCognomeError] = useState(false);
+    const [cognomeErrorMessage, setCognomeErrorMessage] = useState('');
 
     const [nome, setNome] = useState('');
     const [cognome, setCognome] = useState('');
@@ -47,6 +53,30 @@ const CardForm = ({
 
     const validateInputs = () => {
         let isValid = true;
+
+        // Reset degli errori prima di validare
+        setNomeError(false);
+        setNomeErrorMessage('');
+        setCognomeError(false);
+        setCognomeErrorMessage('');
+        setPasswordError(false);
+        setPasswordErrorMessage('');
+
+        // Validazione Nome e Cognome (solo se con dati privati)
+        if (withPrivateData) {
+            if (!nome.trim()) {
+                setNomeError(true);
+                setNomeErrorMessage('Il nome è obbligatorio.');
+                isValid = false;
+            }
+            if (!cognome.trim()) {
+                setCognomeError(true);
+                setCognomeErrorMessage('Il cognome è obbligatorio.');
+                isValid = false;
+            }
+        }
+
+        // Validazione Password
         if (password.length < 6) {
             setPasswordError(true);
             setPasswordErrorMessage('La password dovrebbe essere lunga almeno 6 caratteri.');
@@ -55,10 +85,8 @@ const CardForm = ({
             setPasswordError(true);
             setPasswordErrorMessage('Le password non corrispondono.');
             isValid = false;
-        } else {
-            setPasswordError(false);
-            setPasswordErrorMessage('');
         }
+
         return isValid;
     }
 
@@ -70,8 +98,6 @@ const CardForm = ({
         }
 
         if (onSubmit) {
-            setPasswordError(false);
-            setPasswordErrorMessage('');
             if (onlyVerificationCode) {
                 onSubmit({ verificationCode });
             } else if (withPrivateData) {
@@ -159,6 +185,9 @@ const CardForm = ({
                                                     id="nome"
                                                     value={nome}
                                                     onChange={(e) => setNome(e.target.value)}
+                                                    error={nomeError}
+                                                    helperText={nomeError ? nomeErrorMessage : ''}
+                                                    color={nomeError ? 'error' : 'primary'}
                                                     sx={{ backgroundColor: 'white', mb: 3 }}
                                                 />
                                             </FormControl>
@@ -171,6 +200,9 @@ const CardForm = ({
                                                     id="cognome"
                                                     value={cognome}
                                                     onChange={(e) => setCognome(e.target.value)}
+                                                    error={cognomeError}
+                                                    helperText={cognomeError ? cognomeErrorMessage : ''}
+                                                    color={cognomeError ? 'error' : 'primary'}
                                                     sx={{ backgroundColor: 'white', mb: 3 }}
                                                 />
                                             </FormControl>

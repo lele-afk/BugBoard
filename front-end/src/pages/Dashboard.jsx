@@ -148,7 +148,7 @@ const Dashboard = () => {
                                     label="Priorità Ticket"
                                     onChange={(e) => handleFilterChange(e.target.value)}
                                 >
-                                    <MenuItem value=""><em>Tutte le priorità</em></MenuItem>
+                                    <MenuItem value="">Tutte le priorità</MenuItem>
                                     <MenuItem value="alta">Alta</MenuItem>
                                     <MenuItem value="media">Media</MenuItem>
                                     <MenuItem value="bassa">Bassa</MenuItem>
