@@ -19,3 +19,4 @@ export type ChangeStatusParams = {
     id_issue: number;
     stato: 'todo' | 'in_progress' | 'done';
 }
+export type PrioritaEnum = "high" | "medium" | "low";

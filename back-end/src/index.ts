@@ -80,7 +80,10 @@ app.put("/issue/changeState", async (req, res) => {
 
 app.get("/issue", async (req, res) => {
     try {
-        const response = await getIssue();
+        // Leggiamo la priorità dalla query string (es. /issue?priorita=alta)
+        const priorita = req.query.priorita as string | undefined;
+
+        const response = await getIssue(priorita);
         res.status(200).json(response);
     } catch (err: any) {
         if (err.code && err.message) {
@@ -89,7 +92,7 @@ app.get("/issue", async (req, res) => {
             res.status(500).send("Errore interno");
         }
     }
-})
+});
 
 
 app.post("/user/login", async (req, res) => {

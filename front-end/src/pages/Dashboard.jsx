@@ -14,15 +14,13 @@ import {
     Select,
     MenuItem
 } from '@mui/material';
-import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
-import PriorityHighIcon from '@mui/icons-material/PriorityHigh';
 import AddIcon from '@mui/icons-material/Add';
 import TicketModal from '../component/TicketModal';
 import StyledButton from '../component/StyledButton';
 import FormModal from '../component/FormModal';
 import { useNavigate } from 'react-router-dom';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux';
 import { resetState, resetRegistrationFlag } from '../state/user/userSlice';
 import CreationUserModal from '../component/CreationUserModal';
 import { getIssues } from '../state/issue/issueAction';
@@ -36,33 +34,42 @@ const Dashboard = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isModalOpenOfCreationTicket, setIsModalOpenOfCreationTicket] = useState(false);
     const [isModalCreationOpen, setIsModalCreationOpen] = useState(false);
-    const [err, setErr] = useState(false)
+    const [err, setErr] = useState(false);
     const [createIssueErr, setCreateIssueErr] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
-    const [utente, setUtente] = useState('');
     const [priorita, setPriorita] = useState('');
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-    const navigate = useNavigate()
+    const navigate = useNavigate();
     const dispatch = useDispatch();
-    const { issue, issueLoaded } = useSelector((state) => state.issueState)
-    const user = useSelector((state) => state.userState)
+    const { issue, issueLoaded } = useSelector((state) => state.issueState);
+    const user = useSelector((state) => state.userState);
 
     const fetchIssue = async () => {
         try {
-            await dispatch(getIssues()).unwrap()
+            await dispatch(getIssues(priorita)).unwrap();
         } catch (error) {
-            setErr(true)
+            setErr(true);
         }
-    }
+    };
+
     useEffect(() => {
-        fetchIssue()
+        fetchIssue();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [])
+    }, []);
+
+    const handleFilterChange = async (prioritaSelezionata) => {
+        setPriorita(prioritaSelezionata);
+        try {
+            await dispatch(getIssues(prioritaSelezionata)).unwrap();
+        } catch (error) {
+            setErr(true);
+        }
+    };
 
     const handleCreation = () => {
-        setIsModalCreationOpen(true)
-    }
+        setIsModalCreationOpen(true);
+    };
 
     const handleOpenModal = (ticket) => {
         setSelectedTicket(ticket);
@@ -70,11 +77,12 @@ const Dashboard = () => {
     };
 
     const handleOpenCreateTicket = () => {
-        setIsModalOpenOfCreationTicket(true)
-    }
+        setIsModalOpenOfCreationTicket(true);
+    };
+
     const handleCloseCreateTicket = () => {
-        setIsModalOpenOfCreationTicket(false)
-    }
+        setIsModalOpenOfCreationTicket(false);
+    };
 
     const handleCloseModal = () => {
         setIsModalOpen(false);
@@ -82,13 +90,13 @@ const Dashboard = () => {
     };
 
     const handleLogout = () => {
-        dispatch(resetState())
-        navigate('/')
-    }
+        dispatch(resetState());
+        navigate('/');
+    };
 
     const handleCloseCreationModal = () => {
-        setIsModalCreationOpen(false)
-    }
+        setIsModalCreationOpen(false);
+    };
 
     const handleCreateIssueError = (msg) => {
         setErrorMessage(msg || 'Errore durante l\'inserimento della issue');
@@ -106,7 +114,6 @@ const Dashboard = () => {
                 justifyContent: 'center',
                 boxSizing: 'border-box',
                 p: { xs: 1, sm: 2, md: 3 },
-
                 overflowY: isMobile ? 'auto' : 'hidden',
                 bgcolor: '#ffffff'
             }}
@@ -119,7 +126,6 @@ const Dashboard = () => {
                 flexDirection: 'column'
             }}>
 
-
                 <Box sx={{ mb: 2 }}>
                     <Stack
                         direction={{ xs: 'column', sm: 'row' }}
@@ -127,60 +133,49 @@ const Dashboard = () => {
                         alignItems={{ xs: 'flex-start', sm: 'center' }}
                         justifyContent={{ xs: 'flex-start', sm: 'space-between' }}
                     >
+                        <Stack direction="row" alignItems="center" spacing={1}>
 
-                        <Stack direction="row" spacing={2}>
-                            <FormControl size="small" sx={{ minWidth: 200 }}>
-                                <InputLabel id="select-utente-label">Utente</InputLabel>
-                                <Select
-                                    labelId="select-utente-label"
-                                    id="select-utente"
-                                    value={utente}
-                                    label="Utente"
-                                    onChange={(e) => setUtente(e.target.value)}
-                                    endAdornment={<PersonOutlineIcon sx={{ marginRight: 3, color: 'action.active' }} />}
-                                >
-                                    <MenuItem value="utente1">Utente 1</MenuItem>
-                                    <MenuItem value="utente2">Utente 2</MenuItem>
-                                    <MenuItem value="utente3">Utente 3</MenuItem>
-                                </Select>
-                            </FormControl>
+                            <Typography variant="body2" sx={{ fontWeight: 'bold', color: 'text.secondary' }}>
+                                Filtro
+                            </Typography>
 
-                            <FormControl size="small" sx={{ minWidth: 120 }}>
-                                <InputLabel id="select-priorita-label">Priorità</InputLabel>
+                            <FormControl size="small" sx={{ minWidth: 150 }}>
+                                <InputLabel id="select-priorita-label">Priorità Ticket</InputLabel>
                                 <Select
                                     labelId="select-priorita-label"
                                     id="select-priorita"
                                     value={priorita}
-                                    label="Priorità"
-                                    onChange={(e) => setPriorita(e.target.value)}
-                                    endAdornment={<PriorityHighIcon sx={{ marginRight: 3, color: 'action.active' }} />}
+                                    label="Priorità Ticket"
+                                    onChange={(e) => handleFilterChange(e.target.value)}
                                 >
+                                    <MenuItem value=""><em>Tutte le priorità</em></MenuItem>
                                     <MenuItem value="alta">Alta</MenuItem>
                                     <MenuItem value="media">Media</MenuItem>
                                     <MenuItem value="bassa">Bassa</MenuItem>
                                 </Select>
                             </FormControl>
                         </Stack>
+
                         <Stack direction="row" spacing={2}>
                             <StyledButton
                                 label={"Crea ticket"}
                                 main={true}
                                 endIcon={<AddIcon />}
                                 onClick={handleOpenCreateTicket}
-                            ></StyledButton>
+                            />
                             {user.isAdmin && <StyledButton
                                 label={"Crea utente"}
                                 main={true}
                                 endIcon={<AddIcon />}
                                 onClick={handleCreation}
-                            ></StyledButton>}
+                            />}
                             <StyledButton
                                 label={"Logout"}
                                 main={false}
                                 endIcon={<ArrowBackIcon />}
                                 onClick={handleLogout}
-                            ></StyledButton></Stack>
-
+                            />
+                        </Stack>
                     </Stack>
                 </Box>
 
@@ -241,7 +236,6 @@ const Dashboard = () => {
                                     >
                                         <CardActionArea onClick={() => handleOpenModal(ticket)}>
                                             <CardContent sx={{ p: 1.5, "&:last-child": { pb: 1.5 } }}>
-
                                                 <Typography
                                                     variant="body2"
                                                     sx={{
@@ -284,7 +278,6 @@ const Dashboard = () => {
                                                         {ticket.tipo}
                                                     </Typography>
                                                 </Box>
-
                                             </CardContent>
                                         </CardActionArea>
                                     </Card>
@@ -296,8 +289,9 @@ const Dashboard = () => {
             </Box>
 
             <TicketModal open={isModalOpen} handleClose={handleCloseModal} ticket={selectedTicket} />
-            <FormModal open={isModalOpenOfCreationTicket} handleClose={handleCloseCreateTicket} onError={handleCreateIssueError}></FormModal>
-            <CreationUserModal open={isModalCreationOpen} handleClose={handleCloseCreationModal}></CreationUserModal>
+            <FormModal open={isModalOpenOfCreationTicket} handleClose={handleCloseCreateTicket} onError={handleCreateIssueError} />
+            <CreationUserModal open={isModalCreationOpen} handleClose={handleCloseCreationModal} />
+
             <DomicileBanner
                 severity={'error'}
                 open={err}

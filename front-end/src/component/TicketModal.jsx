@@ -38,8 +38,6 @@ const TicketModal = ({ open, handleClose, ticket: initialTicket }) => {
 
     const [currentStatus, setCurrentStatus] = useState(ticket?.stato || 'todo');
     const [newComment, setNewComment] = useState("");
-
-    // AGGIUNTO: Stato locale per gestire la comparsa e il testo degli errori di backend
     const [errorMessage, setErrorMessage] = useState("");
 
     useEffect(() => {
@@ -48,10 +46,9 @@ const TicketModal = ({ open, handleClose, ticket: initialTicket }) => {
         }
     }, [ticket]);
 
-    // Gestione del timer di chiusura automatica per il successo
     useEffect(() => {
         if (commentoLoaded) {
-            setErrorMessage(""); // Resetta l'errore se l'azione successiva va a buon fine
+            setErrorMessage("");
             const timer = setTimeout(() => {
                 dispatch(resetCommentoLoaded());
             }, 4000);
@@ -59,7 +56,6 @@ const TicketModal = ({ open, handleClose, ticket: initialTicket }) => {
         }
     }, [commentoLoaded, dispatch]);
 
-    // AGGIUNTO: Timer di chiusura automatica per il banner di errore (4 secondi)
     useEffect(() => {
         if (errorMessage) {
             const timer = setTimeout(() => {
@@ -71,7 +67,6 @@ const TicketModal = ({ open, handleClose, ticket: initialTicket }) => {
 
     if (!ticket) return null;
 
-    // Gestione cambio stato con blocco try/catch
     const handleStatusChange = async () => {
         const nextStatus = NEXT_STATUS_MAP[currentStatus];
         if (nextStatus) {
@@ -82,8 +77,7 @@ const TicketModal = ({ open, handleClose, ticket: initialTicket }) => {
             };
 
             try {
-                setErrorMessage(""); // Resetta errori precedenti
-                // .unwrap() estrae il risultato o lancia l'eccezione se la promise viene rifiutata
+                setErrorMessage("");
                 await dispatch(issueChangeStatus(payload)).unwrap();
             } catch (error) {
                 console.error("Errore avanzamento stato:", error);
@@ -92,9 +86,9 @@ const TicketModal = ({ open, handleClose, ticket: initialTicket }) => {
         }
     };
 
-    // Gestione aggiunta commento con blocco try/catch
     const handleAddComment = async () => {
-        if (!newComment.trim()) return;
+        // Ulteriore controllo di sicurezza prima dell'invio
+        if (newComment.trim().length < 4) return;
 
         const payload = {
             id_issue: ticket.id_issue,
@@ -103,7 +97,7 @@ const TicketModal = ({ open, handleClose, ticket: initialTicket }) => {
         };
 
         try {
-            setErrorMessage(""); // Resetta errori precedenti
+            setErrorMessage("");
             if (commentoLoaded) dispatch(resetCommentoLoaded());
 
             await dispatch(commentoInsert(payload)).unwrap();
@@ -141,7 +135,6 @@ const TicketModal = ({ open, handleClose, ticket: initialTicket }) => {
         }
     };
 
-    // Reset completo degli stati di notifica alla chiusura manuale del modal
     const handleCloseModal = () => {
         setErrorMessage("");
         if (commentoLoaded) dispatch(resetCommentoLoaded());
@@ -162,7 +155,6 @@ const TicketModal = ({ open, handleClose, ticket: initialTicket }) => {
                     />
                 </Box>
 
-                {/* Banner di Successo */}
                 <Collapse in={commentoLoaded}>
                     <Alert
                         severity="success"
@@ -175,7 +167,6 @@ const TicketModal = ({ open, handleClose, ticket: initialTicket }) => {
                     </Alert>
                 </Collapse>
 
-                {/* AGGIUNTO: Banner di Errore speculare basato sullo stato locale */}
                 <Collapse in={Boolean(errorMessage)}>
                     <Alert
                         severity="error"
@@ -289,10 +280,12 @@ const TicketModal = ({ open, handleClose, ticket: initialTicket }) => {
                         listaCommenti.map((commento, index) => (
                             <Box key={commento.id_commento || index} sx={{ mb: 1.5, p: 1, bgcolor: 'background.default', borderRadius: 1, borderLeft: '3px solid #4c9aff' }}>
                                 <Box display="flex" justifyContent="space-between">
-                                    <Typography variant="caption" sx={{ fontWeight: 'bold' }}>{commento.utente?.nome
-                                        ? commento.utente.nome
-                                        : (commento.id_utente === idUtente ? commento?.utente?.nome : `Utente #${commento.id_utente}`)
-                                    }</Typography>
+                                    <Typography variant="caption" sx={{ fontWeight: 'bold' }}>
+                                        {commento.utente?.nome
+                                            ? `${commento.utente.nome} ${commento.utente.cognome ?? ''}`.trim()
+                                            : (commento.id_utente === idUtente ? "Tu" : `Utente #${commento.id_utente}`)
+                                        }
+                                    </Typography>
                                     <Typography variant="caption" color="text.secondary">
                                         {commento.created_at
                                             ? new Date(commento.created_at).toLocaleString('it-IT', { timeZone: 'UTC' })
@@ -314,11 +307,16 @@ const TicketModal = ({ open, handleClose, ticket: initialTicket }) => {
                         size="small"
                         multiline
                         maxRows={3}
-                        placeholder="Scrivi un commento..."
+                        placeholder="Scrivi un commento (minimo 4 caratteri)..."
                         value={newComment}
                         onChange={(e) => setNewComment(e.target.value)}
                     />
-                    <StyledButton onClick={handleAddComment} label="Invia" />
+                    {/* AGGIUNTO: Proprietà disabled per bloccare il tasto se il testo è inferiore a 4 caratteri */}
+                    <StyledButton
+                        onClick={handleAddComment}
+                        label="Invia"
+                        disabled={newComment.trim().length < 4}
+                    />
                 </Box>
 
                 <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end' }}>

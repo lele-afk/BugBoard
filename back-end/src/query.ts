@@ -1,7 +1,7 @@
 import { database } from "./server";
 import { commento, issue, utente } from "./db/schemas";
 import { and, arrayOverlaps, asc, count, desc, eq, gte, isNull, lte, sql } from "drizzle-orm";
-import { InsertCommenti, InsertIssue, InsertUtenti, RegistrationUser, SelectUtenti, UserLogged, ResponseEmail, Filter, Role, ChangeStatusParams } from "./db/type";
+import { InsertCommenti, InsertIssue, InsertUtenti, RegistrationUser, SelectUtenti, UserLogged, ResponseEmail, Filter, Role, ChangeStatusParams, PrioritaEnum } from "./db/type";
 import * as bcrypt from "bcryptjs"
 import * as jwt from 'jsonwebtoken'
 import * as nodemailer from 'nodemailer'
@@ -17,12 +17,10 @@ async function checkUser(filters: { email: string; }) {
         throw { code: 500, message: error }
     }
 }
-// Definiamo il tipo per i parametri in ingresso basandoci sugli enum di Drizzle
 
 export async function changeStatusIssue(params: ChangeStatusParams) {
     const { id_issue, stato } = params;
 
-    // 1. Validazione dei dati in ingresso
     if (!id_issue) {
         throw { code: 400, message: "ID del ticket mancante" };
     }
@@ -33,31 +31,28 @@ export async function changeStatusIssue(params: ChangeStatusParams) {
     }
 
     try {
-        // 2. Esegui l'aggiornamento con Drizzle
-        // Usiamo .returning() per farci restituire la riga aggiornata dal database
+
         const updatedIssues = await database
             .update(issue)
             .set({
                 stato: stato,
-                updated_at: new Date() // Aggiorniamo anche il timestamp di modifica
+                updated_at: new Date()
             })
             .where(eq(issue.id_issue, id_issue))
             .returning();
 
-        // 3. Se l'array è vuoto, significa che il ticket con quell'ID non esiste
+
         if (updatedIssues.length === 0) {
             throw { code: 404, message: `Nessun ticket trovato con ID ${id_issue}` };
         }
 
-        // Restituiamo la issue aggiornata (il controller la invierà come JSON al frontend)
+
         return updatedIssues[0];
 
     } catch (error: any) {
 
-        // Se è un errore sollevato da noi (400 o 404), lo rilanciamo così com'è
         if (error.code) throw error;
 
-        // Altrimenti, lo trattiamo come errore interno del database (500)
         throw { code: 500, message: "Impossibile aggiornare il ticket sul database" };
     }
 }
@@ -170,9 +165,18 @@ export async function getIssueWithSameId(filter: Filter) {
     }
 }
 
-export async function getIssue() {
+
+export async function getIssue(priorita?: string) {
     try {
+        //Mappiamo i valori che arrivano dal client (italiano) con quelli del DB (inglese)
+        let prioritaDb: PrioritaEnum | undefined;
+
+        if (priorita === "alta") prioritaDb = "high";
+        else if (priorita === "media") prioritaDb = "medium";
+        else if (priorita === "bassa") prioritaDb = "low";
+
         const issues = await database.query.issue.findMany({
+            where: prioritaDb ? eq(issue.priorita, prioritaDb) : undefined,
             with: {
                 utente: true,
                 commenti: {
@@ -181,10 +185,10 @@ export async function getIssue() {
                     }
                 },
             },
-        })
+        });
         return issues;
     } catch (error) {
-        throw { code: 500, message: "Errore recupero dati." }
+        throw { code: 500, message: "Errore recupero dati." };
     }
 }
 

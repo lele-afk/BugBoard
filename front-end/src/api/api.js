@@ -90,10 +90,12 @@ export const sendMailApi = async (newUser) => {
     }
 }
 
-export const getIssue = async (req) => {
+export const getIssue = async (priorita) => {
     try {
-        const response = await _get('/issue');
-        return response
+        // Se viene passata la priorità, la aggiungiamo all'URL
+        const url = priorita ? `/issue?priorita=${priorita}` : '/issue';
+        const response = await _get(url);
+        return response;
     } catch (error) {
         const message = error?.response?.data?.message || error?.message || "Errore imprevisto";
         const code = error?.response?.status || 500;
