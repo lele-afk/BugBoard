@@ -30,7 +30,7 @@ const FormModal = ({ open, handleClose, onError }) => {
     const [typo, setTypo] = useState('');
     const [file, setFile] = useState(null);
     const [fileName, setFileName] = useState('');
-    const [errorFile, setErrorFile] = useState(''); // <-- Stato locale per gestire l'errore del file
+    const [errorFile, setErrorFile] = useState('');
 
     const handleChangePriority = (event) => setPriority(event.target.value);
     const handleChangeTypo = (event) => setTypo(event.target.value);
@@ -39,7 +39,6 @@ const FormModal = ({ open, handleClose, onError }) => {
         const fileUploaded = e.target.files[0];
         if (!fileUploaded) return;
 
-        // Controllo sul tipo di file (accetta solo PNG e JPEG/JPG)
         const validTypes = ['image/png', 'image/jpeg'];
         if (!validTypes.includes(fileUploaded.type)) {
             setErrorFile('Il file selezionato non è valido. Sono accettati solo formati PNG o JPEG.');
@@ -48,7 +47,6 @@ const FormModal = ({ open, handleClose, onError }) => {
             return;
         }
 
-        // Se il file è valido, azzero l'errore precedente e lo leggo
         setErrorFile('');
         setFileName(fileUploaded.name);
         const reader = new FileReader();
@@ -65,7 +63,7 @@ const FormModal = ({ open, handleClose, onError }) => {
         setTypo('');
         setFile(null);
         setFileName('');
-        setErrorFile(''); // <-- Reset dell'errore alla chiusura/pulizia
+        setErrorFile('');
     };
 
     const handleCloseDialog = () => {
@@ -177,7 +175,6 @@ const FormModal = ({ open, handleClose, onError }) => {
                         </FormControl>
                     </Stack>
 
-                    {/* Banner di Errore per il formato file non valido */}
                     <Collapse in={Boolean(errorFile)}>
                         <Alert
                             severity="error"

@@ -87,7 +87,6 @@ const TicketModal = ({ open, handleClose, ticket: initialTicket }) => {
     };
 
     const handleAddComment = async () => {
-        // Ulteriore controllo di sicurezza prima dell'invio
         if (newComment.trim().length < 4) return;
 
         const payload = {
@@ -311,7 +310,6 @@ const TicketModal = ({ open, handleClose, ticket: initialTicket }) => {
                         value={newComment}
                         onChange={(e) => setNewComment(e.target.value)}
                     />
-                    {/* AGGIUNTO: Proprietà disabled per bloccare il tasto se il testo è inferiore a 4 caratteri */}
                     <StyledButton
                         onClick={handleAddComment}
                         label="Invia"

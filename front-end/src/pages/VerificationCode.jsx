@@ -10,20 +10,15 @@ const VerificationCode = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
-    // Recuperiamo l'intero stato dell'utente per non perdere nulla
     const user = useSelector((state) => state.userState);
     const [err, setErr] = useState(false);
 
-    // CardForm restituisce un oggetto strutturato come { verificationCode: "valore" }
     const handleVerificationCodeSubmit = async (formData) => {
         const inputCode = formData.verificationCode;
-        console.log('formData :>> ', formData);
-        console.log('user :>> ', user);
-        // Controllo di sicurezza: verifichiamo che il codice inserito coincida con quello in Redux
+
         if (String(user.codeVerification) === String(inputCode)) {
             try {
                 setErr(false);
-                // Inviamo al database il pacchetto dati COMPLETO
                 await dispatch(userRegistration({
                     nome: user.nome,
                     cognome: user.cognome,
@@ -34,11 +29,9 @@ const VerificationCode = () => {
 
                 navigate("/");
             } catch (error) {
-                console.log('error :>> ', error);
                 setErr(true);
             }
         } else {
-            // Codice OTP errato inserito dall'utente
             setErr(true);
         }
     };

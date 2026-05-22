@@ -3,10 +3,10 @@ import { commentoInsert, getIssues, issueChangeStatus, issueInsert } from "./iss
 
 const initialState = {
     issue: [],
-    selectedIssue: null,   // Corretto il camelCase uniforme
+    selectedIssue: null,
     issueFiltered: null,
     issueLoaded: false,
-    loadingIssue: false,   // Aggiunto per coerenza con gli extraReducers
+    loadingIssue: false,
 }
 
 const issueSlice = createSlice({
@@ -69,7 +69,6 @@ const issueSlice = createSlice({
     }
 });
 
-// Corretto il refuso nell'export (cera un'unione di parole)
 export const {
     setSelectedIssue,
     clearSelectedIssue,

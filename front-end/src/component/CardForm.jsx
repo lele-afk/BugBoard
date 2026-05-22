@@ -25,7 +25,6 @@ const CardForm = ({
     const [showPassword, setShowPassword] = useState(false);
     const [showRePassword, setShowRePassword] = useState(false);
 
-    // Stati per la gestione degli errori
     const [passwordError, setPasswordError] = useState(false);
     const [passwordErrorMessage, setPasswordErrorMessage] = useState('');
     const [nomeError, setNomeError] = useState(false);
@@ -54,7 +53,6 @@ const CardForm = ({
     const validateInputs = () => {
         let isValid = true;
 
-        // Reset degli errori prima di validare
         setNomeError(false);
         setNomeErrorMessage('');
         setCognomeError(false);
@@ -62,7 +60,6 @@ const CardForm = ({
         setPasswordError(false);
         setPasswordErrorMessage('');
 
-        // Validazione Nome e Cognome (solo se con dati privati)
         if (withPrivateData) {
             if (!nome.trim()) {
                 setNomeError(true);
@@ -76,7 +73,6 @@ const CardForm = ({
             }
         }
 
-        // Validazione Password
         if (password.length < 6) {
             setPasswordError(true);
             setPasswordErrorMessage('La password dovrebbe essere lunga almeno 6 caratteri.');

@@ -28,7 +28,6 @@ function CreationUserModal({ open, handleClose }) {
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
     const dispatch = useDispatch();
 
-    // Stati del Form
     const [nome, setNome] = useState('');
     const [cognome, setCognome] = useState('');
     const [email, setEmail] = useState('');
@@ -36,17 +35,14 @@ function CreationUserModal({ open, handleClose }) {
     const [rePassword, setRePassword] = useState('');
     const [isAdmin, setIsAdmin] = useState(false);
 
-    // Stati Visibilità Password
     const [showPassword, setShowPassword] = useState(false);
     const [showRePassword, setShowRePassword] = useState(false);
 
-    // Stati Validazione ed Errori
     const [passwordError, setPasswordError] = useState(false);
     const [passwordErrorMessage, setPasswordErrorMessage] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [registrationError, setRegistrationError] = useState(false);
 
-    // Controllo per abilitare/disabilitare il pulsante
     const isFormInvalid =
         !nome.trim() ||
         !cognome.trim() ||
@@ -54,7 +50,6 @@ function CreationUserModal({ open, handleClose }) {
         !password.trim() ||
         !rePassword.trim();
 
-    // Handlers visibilità
     const handleClickShowPassword = () => setShowPassword((show) => !show);
     const handleClickShowRePassword = () => setShowRePassword((show) => !show);
     const handleMouseDownPassword = (event) => event.preventDefault();
@@ -83,7 +78,6 @@ function CreationUserModal({ open, handleClose }) {
         event.preventDefault();
         setRegistrationError(false);
 
-        // Controllo di sicurezza aggiuntivo prima del submit
         if (isFormInvalid || !validateInputs() || isSubmitting) {
             return;
         }
@@ -142,7 +136,6 @@ function CreationUserModal({ open, handleClose }) {
                 <DialogContent sx={{ pt: 1 }}>
                     <Stack spacing={3}>
 
-                        {/* Riga Nome e Cognome */}
                         <Stack
                             direction={isMobile ? 'column' : 'row'}
                             spacing={2}
@@ -171,7 +164,6 @@ function CreationUserModal({ open, handleClose }) {
                             />
                         </Stack>
 
-                        {/* Campo Email */}
                         <TextField
                             id="email"
                             name="email"
@@ -184,7 +176,6 @@ function CreationUserModal({ open, handleClose }) {
                             sx={{ backgroundColor: 'white' }}
                         />
 
-                        {/* Riga Password */}
                         <Stack
                             direction={isMobile ? 'column' : 'row'}
                             spacing={2}
@@ -249,7 +240,6 @@ function CreationUserModal({ open, handleClose }) {
                             />
                         </Stack>
 
-                        {/* Checkbox Ruolo (Esclusa dal controllo di validazione) */}
                         <FormControlLabel
                             control={
                                 <Checkbox
@@ -263,7 +253,6 @@ function CreationUserModal({ open, handleClose }) {
                             sx={{ mt: 0.5 }}
                         />
 
-                        {/* Alert Errore Server */}
                         <Collapse in={registrationError}>
                             <Alert
                                 severity="error"

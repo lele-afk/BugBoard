@@ -92,7 +92,6 @@ export const sendMailApi = async (newUser) => {
 
 export const getIssue = async (priorita) => {
     try {
-        // Se viene passata la priorità, la aggiungiamo all'URL
         const url = priorita ? `/issue?priorita=${priorita}` : '/issue';
         const response = await _get(url);
         return response;

@@ -10,7 +10,6 @@ const Registration = () => {
 
     const handleRegistrationSubmit = async (formData) => {
         try {
-            // formData contiene già { nome, cognome, email, password } grazie a CardForm
             await dispatch(sendMail(formData)).unwrap();
             navigate('/verificationCode');
         } catch (error) {
