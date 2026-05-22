@@ -6,6 +6,11 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 In the project directory, you can run:
 
+
+### `npx playwright test tests/** --ui`
+Runs the test with E2E playwright dependency.
+The test are located in tests folder
+
 ### `npm start`
 
 Runs the app in the development mode.\
