@@ -54,18 +54,23 @@ test.describe.serial('Flusso Completo Applicazione', () => {
         });
     });
 
-    // SOTTO-BLOCCO DASHBOARD: Applichiamo la sessione salvata
     test.describe('Dashboard E2E Tests', () => {
 
-        // CORREZIONE: Forza questo blocco di test a riutilizzare lo stato generato dal login precedente
-        test.use({ storageState: 'playwright/.auth/user.json' });
-
         test.beforeEach(async ({ page }) => {
-            await page.goto('/dashboard');
-            await page.waitForLoadState('networkidle');
+            await page.goto('/');
+
+            // Trova i campi di login (adatta i selettori se usi placeholder o label diverse)
+            await page.getByLabel(/email/i).fill('admin@sistema.it');
+            await page.getByLabel(/password/i).fill('test1234')
+
+            // Clicca sul pulsante di login per entrare nella Dashboard
+            await page.getByRole('button', { name: /accedi/i }).click();
+
+            // Aspetta che la Dashboard carichi controllando la colonna TODO
+            await expect(page.getByText('TODO')).toBeVisible();
         });
 
-        test('Dovrebbe mostrare correttamente il layout Kanban con le tre colonne principali', async ({ page }) => {
+        test('Dovrebbe mostrare correttamente il layout  con le tre colonne principali', async ({ page }) => {
             const colonnaTodo = page.locator('text=TODO');
             const colonnaInProgress = page.locator('text=IN_PROGRESS');
             const colonnaDone = page.locator('text=DONE');
@@ -83,6 +88,82 @@ test.describe.serial('Flusso Completo Applicazione', () => {
             await page.getByLabel('Priorità Ticket').click();
             await page.getByRole('option', { name: 'Alta' }).click();
             await rispostaAPIPromise;
+        });
+        test('Dovrebbe mostrare le funzioni Admin e aprire la modale di creazione utente', async ({ page }) => {
+            const bottoneCreaUtente = page.getByRole('button', { name: 'Crea utente' });
+
+            // Ora il bottone sarà visibile perché l'app riceve i dati di sessione corretti
+            await expect(bottoneCreaUtente).toBeVisible();
+            await expect(bottoneCreaUtente).toBeEnabled();
+
+            await bottoneCreaUtente.click();
+
+            const modale = page.getByRole('dialog');
+            await expect(modale).toBeVisible();
+        });
+    });
+
+    test.describe('Flusso Creazione Nuova Issue nella Dashboard', () => {
+
+        // Eseguiamo il login prima di testare la creazione della issue
+        test.beforeEach(async ({ page }) => {
+            await page.goto('/');
+
+            // Trova i campi di login (adatta i selettori se usi placeholder o label diverse)
+            await page.getByLabel(/email/i).fill('admin@sistema.it');
+            await page.getByLabel(/password/i).fill('test1234')
+
+            // Clicca sul pulsante di login per entrare nella Dashboard
+            await page.getByRole('button', { name: /accedi/i }).click();
+
+            // Aspetta che la Dashboard carichi controllando la colonna TODO
+            await expect(page.getByText('TODO')).toBeVisible();
+        });
+
+        test('Dovrebbe aprire la modale, compilare il form e creare una issue con successo', async ({ page }) => {
+            // 1. Clicca sul pulsante "Crea ticket" presente nella Dashboard
+            const btnCreaTicket = page.getByRole('button', { name: 'Crea ticket' });
+            await expect(btnCreaTicket).toBeVisible();
+            await btnCreaTicket.click();
+
+            // 2. Verifica che la modale del form (FormModal) sia aperta
+            // (Immaginando che il form contenga i campi Titolo, Descrizione e Priorità)
+            const inputTitolo = page.getByLabel(/Titolo/i);
+            const inputDescrizione = page.getByLabel(/Descrizione/i);
+
+            await expect(inputTitolo).toBeVisible();
+
+            // 3. Compila i campi del form
+            await inputTitolo.fill('Test Bug Grafico Dashboard');
+            await inputDescrizione.fill('Il testo esce fuori dai margini della card nella colonna IN PROGRESS su schermi piccoli.');
+
+            // Clicca sulla Select usando il suo ID specifico
+            await page.locator('#priority').click();
+
+            // Clicca sulla voce del menu che si è aperta
+            await page.getByRole('option', { name: 'Alta' }).click();
+
+            // --- GESTIONE SELECT TIPOLOGIA ---
+            await page.locator('#typo').click();
+            await page.getByRole('option', { name: 'Bug' }).click()
+
+            // 4. Invia il form (adatta il nome del pulsante invio/conferma dentro FormModal)
+            await page.getByRole('button', { name: /Crea ticket/i }).click();
+
+            // 5. Verifica la comparsa del banner di successo (DomicileBanner)
+            // Nel tuo codice ha titolo "Successo" e messaggio "Inserimento issue completato"
+            const bannerSuccessoTitle = page.getByText('Successo');
+            const bannerSuccessoMessage = page.getByText('Inserimento issue completato');
+
+            await expect(bannerSuccessoTitle).toBeVisible();
+            await expect(bannerSuccessoMessage).toBeVisible();
+
+            // 6. [Opzionale] Verifica che la nuova issue sia visibile nella colonna "TODO"
+            const nuovaCardIssue = page.locator('.MuiCard-root', { hasText: 'Test Bug Grafico Dashboard' });
+            await expect(nuovaCardIssue).toBeVisible();
+
+            // Controlla che mostri il tag corretto (es: tipo di ticket)
+            await expect(nuovaCardIssue.getByText('#')).toBeVisible(); // Controlla la presenza dell'ID generato
         });
     });
 });

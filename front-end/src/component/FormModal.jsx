@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
-import { FormControl, FormLabel, TextField, Dialog, DialogTitle, DialogContent, DialogActions, Box, useMediaQuery, useTheme, Stack, Select, MenuItem, styled, Typography } from '@mui/material';
+import { FormControl, FormLabel, TextField, Dialog, DialogTitle, DialogContent, DialogActions, Box, useMediaQuery, useTheme, Stack, Select, MenuItem, styled, Typography, Collapse, Alert, AlertTitle } from '@mui/material';
 import StyledButton from './StyledButton';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
-import { useDispatch, useSelector } from 'react-redux'; // <-- Aggiunto useSelector per prendere l'utente
+import { useDispatch, useSelector } from 'react-redux';
 import { issueInsert } from '../state/issue/issueAction';
 
 const VisuallyHiddenInput = styled('input')({
@@ -30,6 +30,7 @@ const FormModal = ({ open, handleClose, onError }) => {
     const [typo, setTypo] = useState('');
     const [file, setFile] = useState(null);
     const [fileName, setFileName] = useState('');
+    const [errorFile, setErrorFile] = useState(''); // <-- Stato locale per gestire l'errore del file
 
     const handleChangePriority = (event) => setPriority(event.target.value);
     const handleChangeTypo = (event) => setTypo(event.target.value);
@@ -38,6 +39,17 @@ const FormModal = ({ open, handleClose, onError }) => {
         const fileUploaded = e.target.files[0];
         if (!fileUploaded) return;
 
+        // Controllo sul tipo di file (accetta solo PNG e JPEG/JPG)
+        const validTypes = ['image/png', 'image/jpeg'];
+        if (!validTypes.includes(fileUploaded.type)) {
+            setErrorFile('Il file selezionato non è valido. Sono accettati solo formati PNG o JPEG.');
+            setFile(null);
+            setFileName('');
+            return;
+        }
+
+        // Se il file è valido, azzero l'errore precedente e lo leggo
+        setErrorFile('');
         setFileName(fileUploaded.name);
         const reader = new FileReader();
         reader.onloadend = () => {
@@ -53,6 +65,7 @@ const FormModal = ({ open, handleClose, onError }) => {
         setTypo('');
         setFile(null);
         setFileName('');
+        setErrorFile(''); // <-- Reset dell'errore alla chiusura/pulizia
     };
 
     const handleCloseDialog = () => {
@@ -62,7 +75,6 @@ const FormModal = ({ open, handleClose, onError }) => {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
-
 
         const payload = {
             id_utente: user.idUtente,
@@ -131,8 +143,9 @@ const FormModal = ({ open, handleClose, onError }) => {
                             sx={{ flex: 1 }}
                             required
                         >
-                            <FormLabel htmlFor="priority" sx={{ fontWeight: 'bold', mb: 1 }}>Priorità</FormLabel>
+                            <FormLabel htmlFor="priority" sx={{ fontWeight: 'bold', mb: 1 }} id="priority-label">Priorità</FormLabel>
                             <Select
+                                labelId="priority-label"
                                 id="priority"
                                 value={priority}
                                 onChange={handleChangePriority}
@@ -149,8 +162,9 @@ const FormModal = ({ open, handleClose, onError }) => {
                             sx={{ flex: 1 }}
                             required
                         >
-                            <FormLabel htmlFor="typo" sx={{ fontWeight: 'bold', mb: 1 }}>Tipologia</FormLabel>
+                            <FormLabel htmlFor="typo" sx={{ fontWeight: 'bold', mb: 1 }} id="typo-label">Tipologia</FormLabel>
                             <Select
+                                labelId="typo-label"
                                 id="typo"
                                 value={typo}
                                 onChange={handleChangeTypo}
@@ -162,6 +176,19 @@ const FormModal = ({ open, handleClose, onError }) => {
                             </Select>
                         </FormControl>
                     </Stack>
+
+                    {/* Banner di Errore per il formato file non valido */}
+                    <Collapse in={Boolean(errorFile)}>
+                        <Alert
+                            severity="error"
+                            variant="outlined"
+                            onClose={() => setErrorFile('')}
+                            sx={{ mb: 3, borderRadius: 1.5 }}
+                        >
+                            <AlertTitle sx={{ fontWeight: 'bold' }}>Errore Formato</AlertTitle>
+                            {errorFile}
+                        </Alert>
+                    </Collapse>
 
                     <FormControl>
                         <FormLabel htmlFor="img" sx={{ fontWeight: 'bold', mb: 1 }}>Inserisci immagine</FormLabel>
@@ -176,7 +203,7 @@ const FormModal = ({ open, handleClose, onError }) => {
                                 <VisuallyHiddenInput
                                     type="file"
                                     onChange={handleFileChange}
-                                    accept='image/*'
+                                    accept='image/png, image/jpeg'
                                     data-testid="file-input"
                                 />
                             </StyledButton>
