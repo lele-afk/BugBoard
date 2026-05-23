@@ -1,6 +1,6 @@
-#  Guida di Configurazione: Git & SonarQube in Locale con Docker
+#  Guida di Configurazione: SonarQube in Locale con Docker
 
-Questo documento contiene tutte le istruzioni necessarie per avviare un server locale SonarQube tramite Docker ed eseguire l'analisi del codice in ambiente Windows (PowerShell).
+Questa sezione del documento contiene tutte le istruzioni necessarie per avviare un server locale SonarQube tramite Docker ed eseguire l'analisi del codice in ambiente Windows (PowerShell).
 
 ---
 
@@ -25,3 +25,14 @@ Una volta terminato il comando recarsi su http://localhost:9000 inserire le cred
 
 ## Termine attività 
 Visto il report lanciare il comando `docker-compose down` per terminare il server docker
+
+
+#  Guida di Configurazione: Back-end
+
+## Env
+Il progetto per funzionare necessita di un file .env da creare manualmente contenente tali valori: 
+PORT=3030
+JWT_SECRET=segreto
+EMAIL=didonato992@gmail.com
+PASSWORD_MAIL=firh zwrb dvfz lhox 
+
