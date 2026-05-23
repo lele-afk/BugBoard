@@ -74,6 +74,6 @@ VALUES (
     'Admin',
     'System',
     'admin@sistema.it',
-    '$2a$12$j6nYpo01iwP3/eikr7YkWun72bDKpxJkwRYIhLi3YLvEMdDMxrYAC' ## test1234
+    '$2a$12$j6nYpo01iwP3/eikr7YkWun72bDKpxJkwRYIhLi3YLvEMdDMxrYAC', ## test1234
     'admin'
 );
